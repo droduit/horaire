@@ -1,0 +1,32 @@
+{
+  "name": "Horaire",
+  "short_name": "Horaire",
+  "display": "fullscreen",
+  "scope": "/",
+  "start_url": "index.html",
+  "theme_color": "#ffffff",
+  "background_color": "#ffffff",
+  "icons": [
+    {
+      "src": "src/assets/img/icons/android-chrome-48x48.png",
+      "type": "image/png",
+      "sizes": "48x48"
+    },
+    {
+      "src": "src/assets/img/icons/android-chrome-96x96.png",
+      "type": "image/png",
+      "sizes": "96x96"
+    },
+	{
+		"src": "src/assets/img/icons/android-chrome-192x192.png",
+		"sizes": "192x192",
+		"type": "image/png"
+	},
+	{
+		"src": "src/assets/img/icons/android-chrome-512x512.png",
+		"sizes": "512x512",
+		"type": "image/png"
+	}
+  ]
+    
+}

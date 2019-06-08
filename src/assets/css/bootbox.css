@@ -1,0 +1,48 @@
+.modal-dialog {
+  margin-top: 0;
+  margin-bottom: 0;
+  display: -webkit-box;
+  display: flex;
+  height: 100%; }
+
+.modal-content {
+  margin-top: auto;
+  margin-bottom: auto;
+  border: none; }
+
+.modal-header,
+.modal-footer {
+  padding-top: 1rem;
+  padding-bottom: 1rem; }
+
+.modal-body > .close {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0.5rem 0.75rem;
+  z-index: 1; }
+
+.modal.fade:not(.modal-top):not(.modal-bottom) .modal-dialog {
+  -webkit-transform: translate(0, 0);
+          transform: translate(0, 0); }
+
+.modal-top .modal-content {
+  margin-top: 3rem; }
+
+.modal-bottom.modal.fade .modal-dialog {
+  -webkit-transform: translate(0, 0);
+          transform: translate(0, 0);
+  overflow: hidden; }
+  .modal-bottom.modal.fade .modal-dialog .modal-content {
+    margin-bottom: 0;
+    -webkit-transform: translate(0, 100%);
+            transform: translate(0, 100%);
+    -webkit-transition: 0.3s ease-out;
+    transition: 0.3s ease-out; }
+
+.modal-bottom.modal.show .modal-dialog .modal-content {
+  margin-bottom: 3rem;
+  -webkit-transform: translate(0, 0);
+          transform: translate(0, 0);
+  -webkit-transition: 0.3s ease-out;
+  transition: 0.3s ease-out; }

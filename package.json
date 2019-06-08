@@ -1,0 +1,40 @@
+{
+  "name": "horaire",
+  "version": "1.0.0",
+  "description": "Calcul horaire",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/droduit/horaire.git"
+  },
+  "author": "Dominique Roduit",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/droduit/horaire/issues"
+  },
+  "homepage": "https://github.com/droduit/horaire#readme",
+  "devDependencies": {
+    "@babel/core": "^7.4.4",
+    "@babel/preset-env": "^7.4.4",
+    "babel-core": "^6.26.3",
+    "gulp": "^4.0.1",
+    "gulp-autoprefixer": "latest",
+    "gulp-babel": "^8.0.0",
+    "gulp-clean": "latest",
+    "gulp-concat": "latest",
+    "gulp-cssbeautify": "latest",
+    "gulp-csscomb": "latest",
+    "gulp-csso": "latest",
+    "gulp-less": "latest",
+    "gulp-load-plugins": "latest",
+    "gulp-php2html": "latest",
+    "gulp-rename": "latest",
+    "gulp-uglify": "latest"
+  },
+  "dependencies": {
+    "gulp-htmlmin": "^5.0.1"
+  }
+}

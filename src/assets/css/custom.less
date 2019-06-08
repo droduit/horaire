@@ -1,0 +1,297 @@
+@import 'btn-switch.less';
+
+body {
+	font-family: 'Montserrat', 'Lato', 'Open Sans', 'Helvetica Neue', Helvetica, Calibri, Arial, sans-serif!important;
+	color: @gray;
+	background: #f2f2f2;
+}
+.page {
+  display: none;
+}
+.module-area {
+  width: 620px;
+  position: relative;
+}
+.previous-page {
+  z-index: 9;
+  cursor: pointer;
+  &:hover {
+    color: fade(#fff, 80%);
+  }
+  .name {
+    font-size: 0.8rem;
+    max-width: 90px;
+    overflow-x: hidden;
+    text-overflow: ellipsis;
+  }
+}
+.navbar {
+  > .title {
+    left:0;
+    font-size:0.85rem;
+    position: absolute;
+    text-align:center;
+    width:100%;
+    z-index:1;
+  }
+}
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+  -webkit-appearance: none; 
+  margin: 0; 
+}
+input, .input {
+	font-size: 30px;
+	padding: 0 20px;
+	border: 2px solid #ccc;
+	width: 90%;
+	color: #666;
+	line-height: 1.8;
+	border-radius: 7px;
+	font-family: 'Open Sans', sans-serif;
+	font-weight: bold;
+	text-align: center;
+	background: white;
+}
+input:focus {
+	outline: 0;
+}
+input.error {
+	border-color: #ff0000;  
+}
+input.small {
+	width: 80px
+}
+.popover-body.p0 {
+  padding:.1rem .5rem!important;
+}
+h3 {
+  font-weight: 400;
+  > small {
+    font-weight: 200;
+    font-size: .75em;
+    color: @gray-light;
+  }
+}
+
+.modal-body .signOvertime {
+  display: inline-block;
+  margin-right: 10px;
+  font-weight:bold;
+  font-size: 2.6em;
+  color: #1e7e34;
+  animate: all 0.2s linear;
+}
+.signOvertime:hover {
+  opacity: 0.8;
+  cursor: pointer;
+}
+.signOvertime.minus {
+  color: #bd2130;
+  transform: scaleX(1.2);
+}
+
+.page[data-id="horaire"] {
+  
+  .timer-timelapse-action {
+  	transition: 0.15s linear all;
+  }
+  .timer-timelapse-action.play:hover {
+  	cursor: pointer;
+  	transform: scale(1.1);
+  }
+  .popover.timelapse {
+  	z-index:10;
+  	opacity:0.85
+  }
+  .popover.timelapse .popover-body {
+  	padding: .5rem .5rem;
+  	font-size:0.9em
+  }
+  .solde-horaire-title {
+  	margin-bottom: 1.1rem;
+  	margin-top: 0.5rem;
+  	font-weight: 400;
+  }
+  .solde-horaire-col1 {
+  	width:111px;
+  }
+  .bonusMalusText {
+  	padding-bottom: 0.3rem;
+  }
+  .popover.timelapse .overlay {
+  	position:fixed;
+  	width:94%;
+  	height:87%;
+  	left:3px;
+  	top:3px;
+  	background:rgba(255,255,255,0.75);
+  	z-index: 99;
+  	display: flex;
+  	justify-content:center;
+  	align-items:center
+  }
+  .anim1 {
+  	animation: anim1 1.8s ease-in-out alternate ;
+  	animation-iteration-count: infinite;
+  }
+  @keyframes anim1 {
+  	100%{
+  		transform: scale(1.05);
+      	filter: drop-shadow(1px 1px 16px #dc3545);
+  	}
+  }
+  .nextDayInHours {
+  	font-weight:600;
+  	padding: .4em .8em;
+  	border-radius: 8px;
+  	background: #16a085;
+  }
+  .time-saisie-column {
+    width: 320px
+  }
+  .horaire-layout {
+    justify-content: space-around;
+  }
+}
+
+.page[data-id="calcDay"] {
+  .input.convert {
+    width:190px;
+    height:auto;
+  }
+}
+
+.page[data-id="holidayPlan"] {
+  & #inputs-balance-area {
+    width:585px
+  }
+  & .daysReallyInHolidays {
+    margin: 0 4px;
+    font-size: 1.1em;
+  }
+  & .diffDaysVacation {
+    margin-left: 10px;
+    display: flex;
+  }
+  & .daysToTakeOnBalance {
+    margin: 0 4px;
+    font-size: 1.1em;
+  }
+  & .selectedDatesHoliday {
+    display: flex;
+    background: rgba(38,139,210,0.2);
+    border-radius: 8px;
+    justify-content: space-evenly;
+    align-items: center;
+    align-self: stretch;
+    font-weight: bold;
+    color: black;
+  }
+  & .vacancesStats {
+    padding-left: 0;
+  }
+}
+
+.page[data-id="config-preferences"] {
+  .settings {
+    > .item {
+      vertical-align: middle;
+      justify-content: space-between;
+      align-items: center;
+      transition: 0.15s linear all;
+      cursor: pointer;
+
+      h6 {
+    		font-size: .75rem;
+    		padding-left: 1px;
+    		margin-bottom: 0;
+    		display: flex;
+    		align-items: center;
+        cursor: pointer;
+    	}
+    	.material-icons {
+    		padding-right: 8px
+    	}
+    	&.active .material-icons {
+    		color: @brand-primary;
+      }
+    }
+  }
+}
+
+
+@media screen and (max-width: 700px) {
+  .navbar {
+    margin-bottom: 1rem!important;
+  }
+  .module-area {
+    width: 94%
+  }
+
+  .page[data-id="horaire"] {
+    .horaire-layout {
+      flex-flow: column;
+    }
+    .time-saisie-column {
+      width: 100%;
+      margin-bottom: 0.5rem;
+    }
+    
+    .overtime-module {
+      margin-left: 0!important;
+    }
+    .table-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+    }
+    #pauseMidi {
+      margin-top: 0.2rem!important;
+      margin-bottom: 0.2rem!important;
+    }
+  }
+
+  .form-group {
+    margin-bottom: 0.7rem!important;
+  }
+  .page.example h3 {
+    display: none;
+  }
+
+  .page[data-id="calcDay"] {
+    .input.convert {
+      width: 100%;
+    }
+  }
+
+  .page[data-id="holidayPlan"] {
+    & #inputs-balance-area {
+      width:100%
+    }
+    & .vacancesStats {
+      padding-left: 15px;
+      margin-bottom: 15px;
+    }
+    & .realDaysAndDaysToDeduct {
+      flex-flow: column;
+
+      & .arrows {
+        display:none
+      }
+      & .realDays {
+        margin-top: 16px;
+      }
+    }
+  }
+
+}
+
+@media screen and (max-width: 498px) {
+.page[data-id="holidayPlan"] {
+    & .vacancesStats {
+      margin-top: 6px;
+    }
+  }
+}

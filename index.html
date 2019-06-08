@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fr">
+	<head>
+		<title>Horaire</title>
+		<meta name="description" content="Outil pour le calcul des heures supplémentaires, vacances et solde horaire.">
+		<meta charset="utf-8">
+  		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+  		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+		<link rel="manifest" href="manifest.json">
+
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<link rel="apple-touch-icon" sizes="180x180" href="src/assets/img/icons/apple-touch-icon.png">
+		<link rel="icon" type="image/png" sizes="32x32" href="src/assets/img/icons/favicon-32x32.png">
+		<link rel="icon" type="image/png" sizes="192x192" href="/src/assets/img/icons/android-chrome-192x192.png">
+		<link rel="icon" type="image/png" sizes="16x16" href="src/assets/img/icons/favicon-16x16.png">
+		<link rel="mask-icon" href="src/assets/img/icons/safari-pinned-tab.svg" color="#3a4549">
+		<link rel="shortcut icon" href="src/assets/img/icons/favicon.ico">
+		<meta name="msapplication-TileColor" content="#2b5797">
+		<meta name="msapplication-config" content="src/assets/img/icons/browserconfig.xml">
+		<meta name="theme-color" content="#ffffff">
+
+		<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+		<link rel="stylesheet" type="text/css" href="dist/assets/css/bundle.min.css" />
+	</head>
+	<body>
+
+		<!-- ## start nav main ## -->
+		<nav class="navbar navbar-dark bg-dark text-white mb-5 py-3" id="main-navbar">
+			<div class="dropdown" id="page-picker">
+			  <button class="btn btn-lg btn-outline-secondary" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" aria-label="Menu">
+				<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30" role="img" focusable="false"><title>Menu</title><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"></path></svg>
+			  </button>
+			  <div class="dropdown-menu" aria-labelledby="dropdownMenu2">
+				<button class="dropdown-item active" data-id="horaire" type="button" aria-label="Page de calcul horaire">Calulateur Horaire</button>
+				<button class="dropdown-item" data-id="holidayPlan" type="button" aria-label="Planificateur de vacances">Planificateur de vacances</button>
+				<button class="dropdown-item" data-id="calcDay" type="button" aria-label="Page de conversion de temps">Conversion de temps</button>
+			  </div>
+			</div>
+	  
+			<div class="d-flex">
+				<div class="buttons-horaire">
+					<button class="btn btn-primary btn-lg ml-auto chooseHoraire" type="button" aria-label="Taux horaire"><i class="material-icons mr-1" style="vertical-align:text-bottom">access_time</i> Horaire</button>
+				</div>
+				<div class="buttons-holidayPlan">
+					<button class="btn btn-outline-info ml-auto searchFlight" type="button" aria-label="Chercher un vol" style="display:none"><i class="material-icons" style="vertical-align: text-bottom;">flight</i></button>
+				</div>
+				<button class="btn btn-outline-secondary ml-2" id="config" aria-label="Configuration"><i class="material-icons" style="vertical-align:bottom">settings</i><span class="d-none">Configuration</span></button>
+			</div>
+		</nav>
+		<!-- ## end nav main ## -->
+		
+		<!-- ## start nav back ## -->
+		<nav class="navbar navbar-dark bg-dark text-white mb-5 py-3" id="btn-back-navbar" style="display:none">
+			<div class="d-flex justify-content-center align-items-center previous-page">
+				<button class="btn btn-default px-0" id="btn-back"><i class="material-icons text-white" style="vertical-align:bottom">arrow_back_ios</i></button>
+				<div class="name"></div>
+			</div>
+			<h6 class="font-weight-bold mb-0 title"s></h6>
+		</nav>
+		<!-- ## end nav back ## -->
+
+		<div class="m-auto module-area">
+
+			<!-- ## start config ## -->
+			<div class="page" data-id="config">
+				<div class="list-group" id="pills-tab">
+				  <a href="#config-preferences" class="list-group-item list-group-item-action">
+				  	<i class="material-icons mr-1" style="vertical-align:bottom">star</i> <span>Préférences</span>
+				  </a>
+				  <a href="#config-coupling" class="list-group-item list-group-item-action" style="display:none">
+				  	<i class="material-icons mr-1" style="vertical-align:bottom">phonelink</i> <span>Couplage avec un appareil</span>
+				  </a>
+				  <a href="#config-storage" class="list-group-item list-group-item-action">
+				  	<i class="material-icons mr-1" style="vertical-align:bottom">sd_storage</i> <span>Données enregistrées</span>
+				  </a>
+			  	</div>
+		  	</div>
+			<!-- ## end config ## -->
+
+			<!-- ## start preferences ## -->
+			<div class="page" data-id="config-preferences">
+				<div class="list-group settings">
+				  	<div class="item list-group-item list-group-item-action py-2 px-2 d-flex">
+					    <div class="mr-auto"><h6><i class="material-icons">timer</i> Afficher un timer du temps restant</h6></div>
+				    	<button type="button" id="display_timelapse" default-value="true" class="btn btn-sm btn-toggle" data-toggle="button" aria-pressed="false">
+				    		<div class="handle"></div>
+				    	</button>
+				  	</div>
+					<div class="item list-group-item list-group-item-action py-2 px-2 d-flex">
+					    <div class="mr-auto">
+					    	<h6><i class="material-icons">notifications_active</i> <span class="text">Activer les notifications push</span><small></small></h6>
+					    </div>
+				    	<button type="button" id="enable_notifications" class="btn btn-sm btn-toggle" data-toggle="button" aria-pressed="false">
+					    	<div class="handle"></div>
+					    </button>
+				  	</div>
+			  </div>
+	  		</div>
+		  	<!-- ## start preferences ## -->
+
+		  	<!-- ## start coupling ## -->
+			<div class="page" data-id="config-coupling">
+				<div class="card">
+					<h5 class="card-header">Code de couplage</h5>
+					<div class="card-body">
+						<div class="input-group">
+						  <input type="text" class="form-control" id="coupling-code" autocomplete="off" readonly value="">
+						  <div class="input-group-append">
+						    <button class="btn btn-secondary py-0 d-flex" type="button" id="renew-coupling-code"><i class="material-icons">autorenew</i></button>
+						  </div>
+						</div>
+					</div>
+				</div>
+
+				<div class="card mt-3">
+					<h5 class="card-header">Coupler avec un appareil</h5>
+					<div class="card-body">
+						<div class="input-group">
+						  <input type="text" class="form-control" id="user-coupling-code" autocomplete="off" placeholder="Entrez le code de couplage affiché sur l'autre appareil">
+						  <div class="input-group-append">
+						    <button class="btn btn-primary py-0 d-flex" type="button" id="save-coupling">Coupler</button>
+						  </div>
+						</div>
+					</div>
+				</div>
+			</div>
+		  	<!-- ## start coupling ## -->
+
+			<!-- ## start config-storage ## -->
+			<div class="page" data-id="config-storage">
+				<div class="d-flex align-items-center justify-content-center" style="min-height: 80px">
+					<button type="button" class="btn btn-dark" id="emptyCookies">Vider toutes les valeurs enregistrées</button>
+				</div>
+			</div>
+			<!-- ## end config ## -->
+			
+
+			<!-- ## start horaire ## -->
+			<div class="page" data-id="horaire" style="display:block">
+				
+				<div class="d-flex horaire-layout">
+
+					<div class="time-saisie-column">
+						<div class="group" data-group="1">
+							<div class="border-right pr-3 d-flex align-items-center bg-secondary text-white justify-content-center rounded">
+								<div class="form-group mr-1">
+									<label class="col-form-label mr-3 text-center w-100" for="arr1">Arrivée</label>
+									<input type="text" class="form-control hour _1 small" id="arr1" inputmode="tel"  autocomplete="off">
+								</div>
+									
+								<div class="form-group">
+									<label class="col-form-label mr-3 text-center w-100" for="dep1">Départ</label>
+									<input type="text" class="form-control hour _2 small" id="dep1" inputmode="tel"  autocomplete="off">
+								</div>
+							</div>
+
+							<div class="mt-1 small p-1 bg-dark text-white rounded inter d-flex" style="justify-content:space-evenly">
+								<span class="text-muted">-- : --</span>
+							</div>
+						</div>
+						
+						<div id="pauseMidi" class="text-center border border-secondary py-1 rounded my-2">
+							Pause : --
+						</div>
+						
+						<div class="group" data-group="2">
+							<div class="border-right pr-3 d-flex align-items-center bg-secondary text-white justify-content-center rounded">
+								<div class="form-group mr-1">
+									<label class="col-form-label mr-3 text-center w-100" for="arr2">Arrivée</label>
+									<input type="text" class="form-control hour _3 small" id="arr2" inputmode="tel"  autocomplete="off">
+								</div>
+								
+								<div class="form-group">
+									<label class="col-form-label mr-3 text-center w-100" for="dep2">Départ</label>
+									<input type="text" class="form-control hour _4 small" id="dep2" inputmode="tel"  autocomplete="off">
+								</div>
+							</div>
+							
+							<div class="mt-1 small p-1 bg-dark text-white rounded inter d-flex" style="justify-content:space-evenly">
+								<span class="text-muted">-- : --</span>
+							</div>
+						</div>
+					</div>
+					
+					<div class="pt-2 px-3 pb-0 rounded bg-light border ml-2 overtime-module" style="width:auto">
+						<div class="align-items-center">
+							<h3 class="lead text-center solde-horaire-title text-dark">Solde horaire</h3>
+							<div class="table-container">
+								<table>
+									<tbody>
+										<tr>
+											<td class="solde-horaire-col1"><label class="mr-1 small">Solde à l'arrivée</label></td>
+											<td class="text-center pr-1"><button type="button" class="btn btn-light signOvertime toggle d-block border-0" style="padding:0 7px; background: #ebebeb; box-shadow: none"></button></td>
+											<td><input type="text" class="small" id="previousOvertime" inputmode="tel"  style="padding:0; width: 70px" aria-label="Ancien solde horaire"  autocomplete="off"></td>
+										</tr>
+										<tr class="hSuppToShow" style="display: none">
+											<td><label class="mr-1 small bonusMalusText">Aujourd'hui</label></td>
+											<td class="bonusMalusSign text-center">+</td>
+											<td><input type="text" class="small" id="bonusMalus" inputmode="tel"  readonly style="padding:0; width: 70px" value="00:00" aria-label="Bonus / Malus aujourd'hui"></td>
+										</tr>
+										<tr class="hSuppToShow" style="display: none">
+											<td><label class="mr-1 small" style="font-weight: 500!important">Solde au départ</label></td>
+											<td class="pr-1 text-center">=</td>
+											<td><input type="text" class="small border-0 text-white" inputmode="tel"  id="currentOvertime" style="padding:0; width: 70px" aria-label="Nouveau solde horaire" autocomplete="off"></td>
+										</tr>
+
+										<tr class="hSuppToShow" style="display: none">
+											<td></td>
+											<td class="overtimeDaysEqual text-center" style="display: none">=</td>
+											<td class="overtimeDays small text-center"></td>
+										</tr>
+
+										<tr>
+											<td colspan="3" class="py-2"><hr class="mb-2 mt-1"></td>
+										</tr>
+
+										<tr>
+											<td colspan="3" class="dayHsupp small text-center" style="display:none"></td>
+										</tr>
+
+										<tr>
+											<td colspan="3" class="nextDayInHour small text-center" style="display:none"></td>
+										</tr>
+										
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+					
+				</div>
+
+				<div class="final rounded p-1 px-2 text-center text-white mt-2" style="display:none"></div>
+			</div>
+			<!-- ## end horaire ## -->
+
+			<!-- ## start holiday plan ## -->
+			<div class="page" data-id="holidayPlan">
+				
+				<div id="bt-flight-content" class="mb-3 p-2 rounded" style="display:none">
+				  <form method="post" id="flight-search">
+				  	<div class="input-group">
+						<div class="input-group-prepend">
+							<span class="input-group-text">De</span>
+						</div>
+						
+						<input type="text" aria-label="First name" class="form-control localStorage" data-min-length-localStorage="2" placeholder="Origine" id="flight-origin" list="location" autocomplete="off">
+						
+						<div class="input-group-prepend">
+							<span class="input-group-text">à</span>
+						</div>
+						
+						<input type="text" aria-label="Last name" class="form-control localStorage" data-min-length-localStorage="2" placeholder="Destination" id="flight-dest" list="location">
+
+						<div class="input-group-append">
+						  	<button class="btn input-group-text btn-default border dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aller retour</button>
+							<div class="dropdown-menu">
+								<div class="dropdown-item">Aller-retour</div>
+								<div class="dropdown-item">Aller simple</div>
+							</div>
+						</div>
+						<div class="input-group-append">
+							<button type="submit" class="btn btn-sm btn-dark border"><i class="material-icons" style="vertical-align: bottom">search</i></button>
+						</div>
+					</div>
+
+					<datalist id="location"></datalist>
+				  	
+				  </form>
+				</div>
+
+				<div class="d-flex mx-auto mb-2 rounded p-1 align-items-center justify-content-center bg-secondary text-white" id="inputs-balance-area">
+					<table>
+						<tr>
+							<td class="pr-2"><label for="soldeHoraire" class="small mb-0">Solde horaire utilisable <span class="small">(j)</span></label></td>
+							<td>
+								<input type="text" class="small p-0" inputmode="tel" id="soldeHoraire" style="width: 70px" aria-label="Solde horaire" autocomplete="off">
+							</td>
+							<td class="pl-5 pr-2"><label for="soldeVacances" class="small mb-0">Solde vacances <span class="small">(j)</span></label></td>
+							<td>
+								<input type="text" class="small p-0 localStorage" inputmode="number" id="soldeVacances" maxlength="4" style="width: 70px" aria-label="Solde vacances" autocomplete="off" data-min-length-localStorage="1" data-trigger="focus">
+							</td>
+						</tr>
+					</table>
+				</div>
+
+				<input type="text" id="datepicker1" style="display:none"/>
+				<div style="display:flex; width:100%; justify-content: center" id="containerCalendar"></div>
+		
+				<div id="text-selection" style="display: ">
+					<div class="mb-3 selectedDatesHoliday">
+						<div class="startDateHoliday">-</div>
+						<div class="" style="background: white; padding: 6px 20px; font-weight: normal">au</div>
+						<div class="endDateHoliday">-</div>
+					</div>
+
+					<div class="d-flex justify-content-center align-items-center realDaysAndDaysToDeduct">
+						<div class="d-flex align-items-center">Déduction de <div class="daysToTakeOnBalance badge badge-pill badge-danger" data-placement="bottom">-</div> jours au solde</div>
+						<i class="material-icons mx-3 arrows">compare_arrows</i>
+						<div class="d-flex align-items-center realDays">
+							Profitez de <div class="daysReallyInHolidays badge badge-pill badge-success" data-placement="bottom">-</div> jours
+							<div class="diffDaysVacation badge badge-pill badge-secondary">+<div class="number">0</div></div>
+						</div>
+					</div>
+
+					<div class="row" style="margin-top:50px">
+						
+						<div class="col">
+							<div class="card" >
+							  <h5 class="card-header bg-primary text-white"><i class="material-icons" style="vertical-align: bottom">alarm_add</i> Solde horaire</h5>
+							  <div class="card-body p-2">
+						    	<table>
+						    		<tr>
+										<td class="w-100 pl-2"><label for="soldeHoraireAvant" class="small mb-0 mr-2">Avant vacances</label></td>
+										<td></td>
+										<td><input type="text" class="small p-0" id="soldeHoraireAvant" style="width: 90px" aria-label="Solde horaire avant" readonly></td>
+									</tr>
+									<tr class="text-danger">
+										<td class="w-100 pl-2"><label for="soldeHoraireConsumed" class="small mb-0 mr-2">Consommé</label></td>
+										<td>-</td>
+										<td><input type="text" class="small p-0 text-danger" id="soldeHoraireConsumed" style="width: 90px" aria-label="Solde horaire consommé" readonly></td>
+									</tr>
+									<tr class=" text-dark">
+										<td class="w-100 pl-2"><label for="soldeHoraireRestant" class="small mb-0 mr-2 font-weight-bold">Restant après vacances</label></td>
+										<td></td>
+										<td><input type="text" class="small p-0 font-weight-bold bg-success border-0 text-white" id="soldeHoraireRestant" style="width: 90px" aria-label="Solde horaire restant" readonly></td>
+									</tr>
+								</table>
+							  </div>
+							</div>
+						</div>
+
+						<div class="col vacancesStats">
+							<div class="card">
+							  <h5 class="card-header bg-success text-white"><i class="material-icons" style="vertical-align: bottom">beach_access</i> Solde vacances</h5>
+							  <div class="card-body p-2">
+						    	<table>
+						    		<tr>
+										<td class="w-100 pl-2"><label for="soldeVacancesAvant" class="small mb-0 mr-2">Avant vacances</label></td>
+										<td></td>
+										<td><input type="text" class="small p-0" id="soldeVacancesAvant" style="width: 90px" aria-label="Solde vacances avant" readonly></td>
+									</tr>
+									<tr class="text-danger">
+										<td class="w-100 pl-2"><label for="soldeVacancesConsumed" class="small mb-0 mr-2">Consommé</label></td>
+										<td>-</td>
+										<td><input type="text" class="small p-0 text-danger" id="soldeVacancesConsumed" style="width: 90px" aria-label="Solde vacances consommé" readonly></td>
+									</tr>
+									<tr class=" text-dark">
+										<td class="w-100 pl-2"><label for="soldeVacancesRestant" class="small mb-0 mr-2 font-weight-bold">Restant après vacances</label></td>
+										<td></td>
+										<td><input type="text" class="small p-0 font-weight-bold bg-success border-0 text-white" id="soldeVacancesRestant" style="width: 90px" aria-label="Solde vacances restant" readonly></td>
+									</tr>
+								</table>
+							  </div>
+							</div>
+						</div>
+
+					</div>
+					
+				</div>
+			</div>
+			<!-- ## end holiday plan ## -->
+
+			<!-- ## start converter ## -->
+			<div class="page example" data-id="calcDay">
+				<div class="row">
+				    <div class="col-sm-12">
+				      <h3>Jours <i class="material-icons">compare_arrows</i> Heures</h3>
+				    </div>
+				</div>
+				<div class="form-group bg-dark rounded p-2 pb-3 text-white">
+					<div class="d-flex align-items-center text-center w-100" style="justify-content: space-around; font-weight: 600; font-size: 24px">
+						<label class="col-form-label pt-0 mr-3 d-block" style="width:190px;" for="cdDays">Jours</label>
+						<i class="material-icons text-dark">compare_arrows</i>
+						<label class="col-form-label pt-0 d-block" style="width:190px;" for="cdHours">Heures</label>
+					</div>
+
+					<div class="d-flex align-items-center" style="justify-content: space-around;">
+						<input type="text" class="form-control input convert" id="cdDays" maxlength="6" inputmode="tel"  autocomplete="off">
+						<i class="material-icons">compare_arrows</i>
+						<input type="text" class="form-control input convert" id="cdHours" maxlength="6" inputmode="tel"  autocomplete="off">
+					</div>
+				</div>
+			</div>
+			<!-- ## end converter ## -->
+
+		</div>
+
+		<div class="toast" style="position: absolute; bottom: 10px; right: 15px;" data-delay="3500">
+			<div class="toast-header">
+			  <div class="rounded mr-2 bg-success square" style="width:14px; height:14px"></div>
+			  <strong class="mr-auto title">Evenement</strong>
+			  <small class="time">A l'instant</small>
+			  <button type="button" class="ml-2 mb-1 close" data-dismiss="toast" aria-label="Fermer">
+			    <span aria-hidden="true">&times;</span>
+			  </button>
+			</div>
+			<div class="toast-body"></div>
+		</div>
+		
+		<script src="https://code.jquery.com/jquery-3.4.0.min.js" integrity="sha256-BJeo0qm959uMBGb65z40ejJYGSgR7REI4+CW1fNKwOg=" crossorigin="anonymous"></script>
+		
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+		<script src="dist/assets/js/bundle.min.js"></script>
+		
+</body>
+</html>
