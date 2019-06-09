@@ -27,7 +27,7 @@ var picker = new Lightpick({
 
     	if(start == null || end == null || end.isBefore(start)) {
     		$('#text-selection').hide();
-    		//$(popoversObjects).popover("hide");
+    		$(popoversObjects).popover("hide");
     		return;
     	}
 
@@ -52,7 +52,7 @@ var picker = new Lightpick({
     	let totalTimeInVacation = end.diff(start, 'days') + 1;
 
     	if($('#soldeVacances').val().length <= 0) {
-    		//$('#soldeVacances').attr("data-content", "Renseigner cette valeur").popover("show");
+    		$('#soldeVacances').attr("data-content", "Renseigner cette valeur").popover("show");
     		$('#text-selection').hide();
     		return;
     	}
@@ -64,9 +64,9 @@ var picker = new Lightpick({
         $('.daysReallyInHolidays').html(totalTimeInVacation);
 
         if(Math.trunc(totalTimeInVacation / 7) > 0) {
-        	//$('.daysReallyInHolidays').attr("data-content", fromDaysToWeeksAndDays(totalTimeInVacation)).popover("show");
+        	$('.daysReallyInHolidays').attr("data-content", fromDaysToWeeksAndDays(totalTimeInVacation)).popover("show");
     	} else {
-    		//$('.daysReallyInHolidays').popover("hide");
+    		$('.daysReallyInHolidays').popover("hide");
     	}
 
         $('.diffDaysVacation .number').html(totalTimeInVacation - realTimeToTakeOnVacation);
@@ -79,10 +79,10 @@ var picker = new Lightpick({
     	$('.searchFlight').show();
 
     	if($('#soldeVacances').val().length >= 1) {
-    		//$('#soldeVacancesAvant').val(parseFloat($('#soldeVacances').val())+"j").attr("data-content", fromDaysToWeeksAndDays(parseFloat($('#soldeVacances').val()), 5)).popover("show");
+    		$('#soldeVacancesAvant').val(parseFloat($('#soldeVacances').val())+"j").attr("data-content", fromDaysToWeeksAndDays(parseFloat($('#soldeVacances').val()), 5)).popover("show");
 
     		var soldeVacancesRestant = parseFloat($('#soldeVacances').val()) + parseFloat($('#soldeHoraire').val()) - parseFloat(realTimeToTakeOnVacation+0.0);
-    		//$('#soldeVacancesRestant').val(soldeVacancesRestant+"j").attr("data-content", fromDaysToWeeksAndDays(soldeVacancesRestant, 5)).popover("show");
+    		$('#soldeVacancesRestant').val(soldeVacancesRestant+"j").attr("data-content", fromDaysToWeeksAndDays(soldeVacancesRestant, 5)).popover("show");
     		formatInputBg("#soldeVacancesRestant", soldeVacancesRestant);
 
     		var daysTakenOnSoldeHoraire = parseFloat($('#soldeHoraire').val());
@@ -98,18 +98,18 @@ var picker = new Lightpick({
     		daysTakenOnSoldeVacances = Math.abs(daysTakenOnSoldeVacances);
 
     		$('#soldeHoraireConsumed').val(daysTakenOnSoldeHoraire+"j");
-    		//$('#soldeVacancesConsumed').val(daysTakenOnSoldeVacances+"j").attr("data-content", fromDaysToWeeksAndDays(daysTakenOnSoldeVacances, 5)).popover("show");
+    		$('#soldeVacancesConsumed').val(daysTakenOnSoldeVacances+"j").attr("data-content", fromDaysToWeeksAndDays(daysTakenOnSoldeVacances, 5)).popover("show");
     		
     		var soldeHoraireRestantTime = getTimeForValue($('#currentOvertime').val()) - daysTakenOnSoldeHoraire*getHoraireTime();
     		$('#soldeHoraireRestant').val((soldeHoraireRestantTime < 0 ? '-' : '') + minsToTime(Math.abs(soldeHoraireRestantTime)));
     		formatInputBg('#soldeHoraireRestant', soldeHoraireRestantTime);
     	} else {
-    		//$('#soldeVacances, .daysToTakeOnBalance').popover("hide");
+    		$('#soldeVacances, .daysToTakeOnBalance').popover("hide");
     	}
     },
     onRenderCalendar: function() {
     	$('#text-selection').css("margin-top", $('section.lightpick').outerHeight()+20+"px");
-    	//$(popoversObjects).popover("update");
+    	$(popoversObjects).popover("update");
     }
 });
 
@@ -133,7 +133,7 @@ $(function(){
 		trigger:"manual",
 		html:true,
 		container:".page[data-id=holidayPlan]",
-		template:'<div class="popover" role="tooltip"><div class="popover-body p0"></div></div>',
+		template:'<div class="popover" role="tooltip"><div class="arrow"></div><div class="popover-body p0"></div></div>',
 		sanitize: false
 	});
 
@@ -175,7 +175,7 @@ $(function(){
 	$('.searchFlight').click(function(){
 		$('#bt-flight-content').toggle();
 		$('#flight-origin').focus();
-		//$(popoversObjects).popover("update");
+		$(popoversObjects).popover("update");
 	});
 
 	$('#flight-origin, #flight-dest').keyup(function(){

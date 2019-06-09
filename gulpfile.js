@@ -26,7 +26,7 @@ gulp.task('css-clean-preprocess-concat-minify', function () {
       path.dev.css + 'material-icons.css',
       path.dev.css + 'custom.less',
       path.dev.css + 'bootbox.css',
-      path.dev.css + 'lightpick.css'
+      path.dev.css + 'lightpick.less'
     ])
     .pipe(plugins.less()) // preprocess less
     .pipe(plugins.concat('bundle.css'))

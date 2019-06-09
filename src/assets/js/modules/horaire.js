@@ -177,9 +177,14 @@ $(function(){
 		$('.page[data-id="horaire"]').on('click', '.publicHoliday', function(){
 			var slctDay = $(this).data("date");
 			bootbox.alert({
-				title: "Jours fériés "+moment().format("YYYY"),
+				title: "Jours fériés à venir",
 				message: '<ul class="list-group">' +
-  					publicHolidays.map(x => { return '<li class="list-group-item '+(moment(x).isSame(moment(slctDay)) ? 'active' : '')+'">'+moment(x).format("dddd, DD MMMM")+'</li>'; }).join("")
+  					publicHolidays
+  					.filter(day => {
+  						let momentDay = moment(day);
+  						return momentDay.isAfter(moment()) && momentDay.isBefore(moment(moment().get('year')+'-01-03').add(1, 'years'));
+  					})
+  					.map(x => { return '<li class="list-group-item py-1 '+(moment(x).isSame(moment(slctDay)) ? 'active' : '')+'">'+moment(x).format("dddd, DD MMMM YYYY")+'</li>'; }).join("")
   					+ '</ul>',
 				size: "small",
 				scrollable: true

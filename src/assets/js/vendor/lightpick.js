@@ -63,9 +63,8 @@
         },
         locale: {
             buttons: {
-                prev: '&leftarrow;',
-                next: '&rightarrow;',
-                close: '&times;',
+                prev: '<i class="material-icons">arrow_left</i>',
+                next: '<i class="material-icons">arrow_right</i>',
                 reset: 'Reset',
                 apply: 'Ok',
             },
@@ -93,16 +92,20 @@
 
     renderTopButtons = function(opts)
     {
-        return '<div class="lightpick__toolbar">'
-            + ''
-            + '<button type="button" class="lightpick__previous-action">' + opts.locale.buttons.prev + '</button>'
-            + '<button type="button" class="lightpick__next-action">' + opts.locale.buttons.next + '</button>'
+        return '<div class="lightpick__toolbar border-bottom p-1">'
+                + '<div class="d-flex align-items-center small pl-1">'
+                    + '<div class="lp__bullet-publicHolidays"></div> Jours fériés'
+                + '</div>'
+                + '<div class="ml-auto buttons">'
+                    + '<button type="button" class="btn btn-light lightpick__previous-action">' + opts.locale.buttons.prev + '</button>'
+                    + '<button type="button" class="btn btn-light lightpick__next-action">' + opts.locale.buttons.next + '</button>'
+                + '</div>'
             + '</div>';
     },
 
     weekdayName = function(opts, day, short)
     {
-        return new Date(1970, 0, day).toLocaleString(opts.lang, { weekday: short ? 'short' : 'long' })
+        return new Date(1970, 0, day).toLocaleString(opts.lang, { weekday: short ? 'short' : 'long' }).substring(0,1)
     },
 
     renderDay = function(opts, date, dummy, extraClass)
@@ -264,6 +267,10 @@
 
     renderMonthsList = function(date, opts) 
     {
+        if(Number.parseInt(moment().format('YYYY')) == parseInt(moment(date).get('year'))) {
+            return '<div class="lightpick__select lightpick__select-months mr-0">'+date.toDate().toLocaleString(opts.lang, { month: 'long' })+'</div>';
+        }
+
         var d = moment(date),
             select = document.createElement('select');
 
@@ -304,10 +311,12 @@
         if (Number.parseInt(date.format('YYYY')) < minYear) {
             minYear = Number.parseInt(date.format('YYYY'));
         }
+        minYear = parseInt(moment().get('year'));
 
         if (Number.parseInt(date.format('YYYY')) > maxYear) {
             maxYear = Number.parseInt(date.format('YYYY'));
         }
+        maxYear += 1;
 
         for (var idx = minYear; idx <= maxYear; idx++) {
             d.set('year', idx);
@@ -334,6 +343,16 @@
 
     renderCalendar = function(el, opts)
     {
+
+        var prevBtCalendar = el.querySelector('.lightpick__previous-action');
+        var currentMonth = opts.calendar[0];
+        if(parseInt(currentMonth.get('year')) == parseInt(moment().get('year')) && 
+            parseInt(currentMonth.get("month")) <= parseInt(moment().get("month"))) {
+            prevBtCalendar.setAttribute("disabled", true);
+        } else {
+            prevBtCalendar.removeAttribute('disabled');
+        }
+
         var html = '',
             monthDate = moment(opts.calendar[0]);
 
@@ -344,7 +363,7 @@
             html += '<header class="lightpick__month-title-bar">'
             html += '<div class="lightpick__month-title">'
             + renderMonthsList(day, opts)
-            + renderYearsList(day, opts)
+            + (parseInt(moment().get('year')) != parseInt(day.get('year')) ? renderYearsList(day, opts) : '')
             + '</div>';
 
             if (opts.numberOfMonths === 1) {
@@ -367,7 +386,7 @@
                     daysInMonth = prevMonth.daysInMonth();
 
                 for (var d = prevMonth.get('date'); d <= daysInMonth; d++) {
-                    html += renderDay(opts, prevMonth, i > 0, 'is-previous-month');
+                    html += renderDay(opts, prevMonth, true, 'is-previous-month');
 
                     prevMonth.add(1, 'day');
                 }
@@ -387,7 +406,7 @@
 
             if (nextDays < 7) {
                 for (var d = nextMonth.get('date'); d <= nextDays; d++) {
-                    html += renderDay(opts, nextMonth, i < opts.numberOfMonths - 1, 'is-next-month');
+                    //html += renderDay(opts, nextMonth, i < opts.numberOfMonths - 1, 'is-next-month');
 
                     nextMonth.add(1, 'day');
                 }
@@ -625,14 +644,11 @@
                     }
                 }
             }
-            else if (target.classList.contains('lightpick__previous-action')) {
+            else if (target.classList.contains('lightpick__previous-action') || target.parentNode.classList.contains('lightpick__previous-action')) {
                 self.prevMonth();
             }
-            else if (target.classList.contains('lightpick__next-action')) {
+            else if (target.classList.contains('lightpick__next-action') || target.parentNode.classList.contains('lightpick__next-action')) {
                 self.nextMonth();
-            }
-            else if (target.classList.contains('lightpick__close-action') || target.classList.contains('lightpick__apply-action')) {
-                self.hide();
             }
             else if (target.classList.contains('lightpick__reset-action')) {
                 self.reset();
@@ -1010,7 +1026,12 @@
 
         prevMonth: function()
         {
-            this._opts.calendar[0] = moment(this._opts.calendar[0]).subtract(this._opts.numberOfMonths, 'month');
+            if(this.el.querySelector('.lightpick__previous-action').hasAttribute("disabled")) {
+                return;
+            }
+      
+            // this._opts.numberOfMonths
+            this._opts.calendar[0] = moment(this._opts.calendar[0]).subtract(1, 'month');
 
             renderCalendar(this.el, this._opts);
 
@@ -1019,7 +1040,7 @@
 
         nextMonth: function()
         {
-            this._opts.calendar[0] = moment(this._opts.calendar[1]);
+            this._opts.calendar[0] = moment(this._opts.calendar[1]).subtract(1, 'month');
 
             renderCalendar(this.el, this._opts);
 

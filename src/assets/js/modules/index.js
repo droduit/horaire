@@ -63,6 +63,8 @@ window.onpopstate = function(event) {
 
 const nav = {
 	switchPage: function(idPage, pageToLoad, state, idNavToDisplay = "main-navbar", addStateInHistory = true) {
+		$('body > .popover').remove();
+		
 		idPage = idPage || "horaire";
 
 		if(idPage == "holidayPlan") {
