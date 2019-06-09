@@ -149,14 +149,6 @@ $(function(){
 		}
 	});
 
-	if(localStorage.getItem("startHoliday") != null) {
-		var holidaysStartingDay = moment(localStorage.getItem("startHoliday"));
-		if(!moment().isAfter(holidaysStartingDay)) {
-			let nbDaysBeforeHolidays = holidaysStartingDay.diff(moment(), 'days') + 1;
-			$('.page[data-id="horaire"]').append('<div class="alert alert-success mt-3 text-center p-2">Vos vacances commencent dans '+nbDaysBeforeHolidays+' jours.</div>');
-		}
-	}
-
 	function getPublicHolidaysComingSoon() {
 		let comingPublicHolidays = [];
 		for(var i = 1; i < 14; ++i) {
@@ -172,7 +164,7 @@ $(function(){
 	if(comingPublicHolidays.length > 0) {
 		var textHolidays = '';
 		getPublicHolidaysComingSoon().forEach( day => textHolidays += '<a href="#" data-date="'+day.format('YYYY-MM-DD')+'" class="badge badge-danger ml-1 publicHoliday">'+day.format('dddd DD MMMM')+"</a>" );
-		$('.page[data-id="horaire"]').append('<div class="alert alert-danger mt-2 text-center p-2">Jours fériés '+textHolidays+'</div>');
+		$('.page[data-id="horaire"]').append('<div class="alert alert-danger mt-2 mb-0 text-center p-2">Jours fériés '+textHolidays+'</div>');
 	
 		$('.page[data-id="horaire"]').on('click', '.publicHoliday', function(){
 			var slctDay = $(this).data("date");
@@ -192,7 +184,23 @@ $(function(){
 		});
 	}
 
+	displayTimelapseBeforeHolidays();
+
 });
+
+function displayTimelapseBeforeHolidays() {
+	if(localStorage.getItem("startHoliday") != null) {
+		var holidaysStartingDay = moment(localStorage.getItem("startHoliday"));
+		if(!moment().isAfter(holidaysStartingDay)) {
+			let nbDaysBeforeHolidays = holidaysStartingDay.diff(moment(), 'days') + 1;
+			let textTimelapseBeforeHolidays = 'Vos vacances commencent dans '+nbDaysBeforeHolidays+' jours.';
+			if($('.timelapseBeforeHolidays').length <= 0) {
+				$('.page[data-id="horaire"]').append('<div onclick="document.location=\'#holidayPlan\';" style="cursor:pointer" class="timelapseBeforeHolidays alert alert-success mt-2 text-center p-2"></div>');
+			} 
+			$('.timelapseBeforeHolidays').html(textTimelapseBeforeHolidays);
+		}
+	}
+}
 
 function askHoraire() {
 	var dialog = bootbox.dialog({

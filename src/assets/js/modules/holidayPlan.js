@@ -103,6 +103,8 @@ var picker = new Lightpick({
     		var soldeHoraireRestantTime = getTimeForValue($('#currentOvertime').val()) - daysTakenOnSoldeHoraire*getHoraireTime();
     		$('#soldeHoraireRestant').val((soldeHoraireRestantTime < 0 ? '-' : '') + minsToTime(Math.abs(soldeHoraireRestantTime)));
     		formatInputBg('#soldeHoraireRestant', soldeHoraireRestantTime);
+
+    		displayTimelapseBeforeHolidays();
     	} else {
     		$('#soldeVacances, .daysToTakeOnBalance').popover("hide");
     	}
@@ -201,6 +203,17 @@ $(function(){
 		window.open('https://www.momondo.ch/flight-search/'+origin+'-'+dest+'/'+localStorage.getItem("startHoliday")+'/'+localStorage.getItem("endHoliday")+'?sort=happinessScore_b');
 		return false;
 	});
+
+	$('.resetHolidaySearch')
+		.popover({trigger:"hover", placement:'top'})
+		.click(function(){
+			localStorage.removeItem("startHoliday");
+			localStorage.removeItem("endHoliday");
+			$('.popover').remove();
+			$('#text-selection').fadeOut("medium");
+			picker.reset();
+			$('.timelapseBeforeHolidays').remove();
+		});
 
 });
 

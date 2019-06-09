@@ -105,7 +105,8 @@
 
     weekdayName = function(opts, day, short)
     {
-        return new Date(1970, 0, day).toLocaleString(opts.lang, { weekday: short ? 'short' : 'long' }).substring(0,1)
+        var weekDay = new Date(1970, 0, day).toLocaleString(opts.lang, { weekday: short ? 'short' : 'long' });
+        return short ? weekDay.substring(0,1) : weekDay;
     },
 
     renderDay = function(opts, date, dummy, extraClass)
@@ -343,14 +344,15 @@
 
     renderCalendar = function(el, opts)
     {
-
         var prevBtCalendar = el.querySelector('.lightpick__previous-action');
-        var currentMonth = opts.calendar[0];
-        if(parseInt(currentMonth.get('year')) == parseInt(moment().get('year')) && 
-            parseInt(currentMonth.get("month")) <= parseInt(moment().get("month"))) {
-            prevBtCalendar.setAttribute("disabled", true);
-        } else {
-            prevBtCalendar.removeAttribute('disabled');
+        if(prevBtCalendar != null) {
+            var currentMonth = opts.calendar[0];
+            if(parseInt(currentMonth.get('year')) == parseInt(moment().get('year')) && 
+                parseInt(currentMonth.get("month")) <= parseInt(moment().get("month"))) {
+                prevBtCalendar.setAttribute("disabled", "");
+            } else {
+                prevBtCalendar.removeAttribute('disabled');
+            }
         }
 
         var html = '',
@@ -367,7 +369,7 @@
             + '</div>';
 
             if (opts.numberOfMonths === 1) {
-                html += renderTopButtons(opts, 'days');
+                //html += renderTopButtons(opts, 'days');
             }
 
             html += '</header>'; // lightpick__month-title-bar
@@ -480,7 +482,7 @@
         }
 
         var html = '<div class="lightpick__inner">'
-        + (opts.numberOfMonths > 1 ? renderTopButtons(opts, 'days') : '')
+        + renderTopButtons(opts, 'days')
         + '<div class="lightpick__months"></div>'
         + '<div class="lightpick__tooltip" style="visibility: hidden"></div>';
 
@@ -1040,7 +1042,11 @@
 
         nextMonth: function()
         {
-            this._opts.calendar[0] = moment(this._opts.calendar[1]).subtract(1, 'month');
+            this._opts.calendar[0] = moment(this._opts.calendar[1]);
+
+            if (this._opts.numberOfMonths > 1) {
+                this._opts.calendar[0] = this._opts.calendar[0].subtract(this._opts.numberOfMonths - 1, 'month');
+            }
 
             renderCalendar(this.el, this._opts);
 
