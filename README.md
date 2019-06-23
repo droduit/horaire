@@ -1,10 +1,7 @@
 # Horaire
-This Progressive Web App calculate your departure time according to your work schedule, your arrivals and departures.
-
+This Progressive Web App calculate your departure time according to your worktime, arrivals and departures.
 It helps you maintain good habits with a positive hourly balance, or to raise a negative balance.
-
 Push notifications are sent once your working time is over.
-
 A service worker cache and fetch the cached files to provide an offline availability.
 
 # Developers
