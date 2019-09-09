@@ -87,14 +87,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function changeNotificationSwitchState(state) {
     var notificationParamRow = notifSwitch.closest(".item");
+    var notifStatusIcon = $('.notif-status-icon');
 
     $('.loader-notification').remove();
+
+    notifStatusIcon.text("notifications_off").removeAttr("title").attr("data-original-title", "Notifications désactivées").removeClass("active");
 
     switch (state) {
       case 'enabled':
         if(!notificationParamRow.hasClass("definitive-disabled")) {
           notifSwitch.removeClass("disabled").removeAttr("disabled").addClass("active");
           notificationParamRow.removeClass("disabled");
+          notifStatusIcon.text("notifications_active").removeAttr("title").attr("data-original-title", "Notifications activées").addClass("active");
           isPushEnabled = true;
         }
         break;

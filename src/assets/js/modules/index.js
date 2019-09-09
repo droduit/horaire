@@ -55,6 +55,8 @@ $(function(){
 	} else {
 		gm.triggerActions("call2");
 	}
+
+	$('[data-toggle="tooltip"]').tooltip();
 });
 
 window.onpopstate = function(event) {
