@@ -58,10 +58,6 @@ $(function(){
 		gm.triggerActions("call2");
 	}
 
-	if(!localStorage.getItem("version")) {
-		user.register();
-	}
-
 	$('body').tooltip({selector:'[data-toggle="tooltip"]'});
 });
 
@@ -186,22 +182,52 @@ const gm = {
 
 const user = {
 	register : function() {
-		fetch('src/call_api.php?endpoint=users', {
-	      method: 'POST',
-	      body: JSON.stringify({
-	      	ipv4 : localStorage.getItem("ip"),
-	      	couplingCode : localStorage.getItem("coupling-code"),
-	      	username : localStorage.getItem("username") 
-	      })
-	    });
+		var body = {
+		    ipv4 : localStorage.getItem("ip"),
+		    couplingCode : localStorage.getItem("coupling-code"),
+		    username : localStorage.getItem("username") 
+	    };
+		api.post('users', body);
 	}
 }
 
 const api = {
-	fetch: function(url, callback) {
-		fetch(url)
-		.then(response => response.ok ? response.json() : Promise.reject({err: response.status}))
-		.then(json => callback(json))
-		.catch(error => console.log("Request failed", error));	
+	get: function(endpoint, callbackSuccess, callbackError) {
+		api.request(endpoint, "GET", null, callbackSuccess, callbackError);
+	},
+	post: function(endpoint, body, callbackSuccess, callbackError) {
+		api.request(endpoint, "POST", body, callbackSuccess, callbackError);
+	},
+	put: function(endpoint, body, callbackSuccess, callbackError) {
+		api.request(endpoint, "PUT", body, callbackSuccess, callbackError);
+	},
+	delete: function(endpoint, callbackSuccess, callbackError) {
+		api.request(endpoint, "DELETE", null, callbackSuccess, callbackError);
+	},
+	request: function(endpoint, method, body, callbackSuccess, callbackError) {
+		const fetchOptions = {};
+		if (method != null) { fetchOptions.method = method; }
+		if (body != null) { fetchOptions.body = JSON.stringify(body); }
+
+		fetch("src/call_api.php?endpoint="+endpoint, fetchOptions)
+		.then(response => response.ok ? response.text() : Promise.reject({err: response.status}) )
+		.then(text => {
+			try {
+				return JSON.parse(text);
+			} catch (error) {
+				callbackSuccess(text);
+			}
+		})
+		.then(json => {
+			if (callbackSuccess != null) {
+				callbackSuccess(json);
+			}
+		})
+		.catch(error => { 
+			if (callbackError != null) {
+				callbackError(error);
+			}
+			console.log("Request failed", error);
+		});	
 	}
 }

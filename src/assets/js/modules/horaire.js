@@ -237,7 +237,8 @@ $(function(){
 	// Affiche les timbrages en base de données s'ils existent
 	if(localStorage.getItem("username")) {
 		function getTimbragesFromDB() {
-			api.fetch('src/call_api.php?endpoint=user-storage/'+localStorage.getItem("coupling-code")+"&date="+moment().format("YYYY-MM-DD"), function(json){
+			api.get('user-storage/'+localStorage.getItem("coupling-code")+"&date="+moment().format("YYYY-MM-DD"),
+			json => {
 				if (json.timbrages) {
 					json.timbrages.split(",").forEach( (timbrage, index) => {
 						var hourElem = $('.hour[idxTimeInput="'+(++index)+'"]');

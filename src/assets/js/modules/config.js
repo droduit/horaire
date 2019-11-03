@@ -67,13 +67,12 @@ $(function(){
 		$('#emptyCookies .loader').show();
 		bootbox.confirm("Les fichiers en cache et toutes les valeurs enregistrées seront effacées.", function(result){
 			if (result) {
-				fetch('src/call_api.php?endpoint=users/'+localStorage.getItem("coupling-code"), {
-	      			method: 'DELETE'
-	  			}).then(response => {
-	  				caches.keys().then( keyList => keyList.map(key => caches.delete(key)));
-	  				localStorage.clear();
-	  				document.location = '';
-	  			});
+				api.delete('users/'+localStorage.getItem("coupling-code"),
+					function() {
+		  				caches.keys().then( keyList => keyList.map(key => caches.delete(key)));
+		  				localStorage.clear();
+		  				document.location = '';
+		  			});
 			} else {
 				$('#emptyCookies .loader').hide();
 			}
