@@ -45,13 +45,13 @@
 				<div class="buttons-holidayPlan">
 					<button class="btn btn-outline-info ml-auto searchFlight" type="button" aria-label="Chercher un vol" style="display:none"><i class="material-icons" style="vertical-align: text-bottom;">flight</i></button>
 				</div>
-				<button class="btn btn-outline-secondary ml-2" id="config" aria-label="Configuration"><i class="material-icons" style="vertical-align:bottom">settings</i><span class="d-none">Configuration</span></button>
+				<button class="btn btn-outline-secondary ml-2" id="config" aria-label="Réglages" title="Réglages"><i class="material-icons" style="vertical-align:bottom">settings</i><span class="d-none">Réglages</span></button>
 			</div>
 		</nav>
 		<!-- ## end nav main ## -->
 		
 		<!-- ## start nav back ## -->
-		<nav class="navbar navbar-dark bg-dark text-white mb-5 py-3" id="btn-back-navbar" style="display:none">
+		<nav class="navbar navbar-dark bg-dark text-white mb-3 py-3" id="btn-back-navbar" style="display:none">
 			<div class="d-flex justify-content-center align-items-center previous-page">
 				<button class="btn btn-default px-0" id="btn-back"><i class="material-icons text-white" style="vertical-align:bottom">arrow_back_ios</i></button>
 				<div class="name"></div>
@@ -65,14 +65,14 @@
 			<!-- ## start config ## -->
 			<div class="page" data-id="config">
 				<div class="list-group" id="pills-tab">
+				  <a href="#config-storage" class="list-group-item list-group-item-action">
+				  	<i class="material-icons mr-1" style="vertical-align:bottom">info</i> <span>Informations</span>
+				  </a>
 				  <a href="#config-preferences" class="list-group-item list-group-item-action">
 				  	<i class="material-icons mr-1" style="vertical-align:bottom">star</i> <span>Préférences</span>
 				  </a>
 				  <a href="#config-coupling" class="list-group-item list-group-item-action" style="display:none">
 				  	<i class="material-icons mr-1" style="vertical-align:bottom">phonelink</i> <span>Couplage avec un appareil</span>
-				  </a>
-				  <a href="#config-storage" class="list-group-item list-group-item-action">
-				  	<i class="material-icons mr-1" style="vertical-align:bottom">sd_storage</i> <span>Données enregistrées</span>
 				  </a>
 			  	</div>
 		  	</div>
@@ -105,7 +105,7 @@
 					<h5 class="card-header">Code de couplage</h5>
 					<div class="card-body">
 						<div class="input-group">
-						  <input type="text" class="form-control" id="coupling-code" autocomplete="off" readonly value="">
+						  <input type="text" class="form-control coupling-code" autocomplete="off" readonly value="">
 						  <div class="input-group-append">
 						    <button class="btn btn-secondary py-0 d-flex" type="button" id="renew-coupling-code"><i class="material-icons">autorenew</i></button>
 						  </div>
@@ -129,9 +129,27 @@
 
 			<!-- ## start config-storage ## -->
 			<div class="page" data-id="config-storage">
-				<div class="d-flex align-items-center justify-content-center" style="min-height: 80px">
-					<button type="button" class="btn btn-dark" id="emptyCookies">Vider toutes les valeurs enregistrées</button>
-				</div>
+				<div class="list-group settings">
+				  	<div class="item list-group-item py-2 px-2 d-flex disabled bg-light">
+					    <div class="mr-auto"><h6>Version de l'application</h6></div>
+				    	<div id="version" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
+				  	</div>
+				  	<div class="item list-group-item py-2 px-2 d-flex disabled bg-light">
+					    <div class="mr-auto"><h6>Identifiant unique</h6></div>
+				    	<div class="coupling-code" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
+				  	</div>
+				  	<div class="item list-group-item py-2 px-2 disabled bg-light" id="config-username" style="display:none">
+					    <div class="mr-auto"><h6>Utilisateur lié</h6></div>
+				    	<div class="username" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
+				  	</div>
+			  	</div>
+
+			  	<div class="list-group settings mt-2">
+					<div class="item list-group-item list-group-item-action py-2 px-2 d-flex" id="emptyCookies">
+					    <div class="mr-auto"><h6><i class="material-icons">settings_backup_restore</i> Restaurer tous les réglages par défaut</h6></div>
+					    <img src="src/assets/img/loader-info.svg" class="loader" style="width: 24px; display: none">
+				  	</div>
+			  	</div>
 			</div>
 			<!-- ## end config ## -->
 			
@@ -139,6 +157,9 @@
 			<!-- ## start horaire ## -->
 			<div class="page" data-id="horaire" style="display:block">
 				
+
+				<div id="timeline"></div>
+
 				<div class="d-flex horaire-layout">
 
 					<div class="time-saisie-column">
@@ -146,12 +167,12 @@
 							<div class="border-right pr-3 d-flex align-items-center bg-secondary text-white justify-content-center rounded">
 								<div class="form-group mr-1">
 									<label class="col-form-label mr-3 text-center w-100" for="arr1">Arrivée</label>
-									<input type="text" class="form-control hour _1 small" id="arr1" inputmode="tel"  autocomplete="off">
+									<input type="text" class="form-control hour _1 small" id="arr1" idxTimeInput="1" inputmode="tel" autocomplete="off">
 								</div>
 									
 								<div class="form-group">
 									<label class="col-form-label mr-3 text-center w-100" for="dep1">Départ</label>
-									<input type="text" class="form-control hour _2 small" id="dep1" inputmode="tel"  autocomplete="off">
+									<input type="text" class="form-control hour _2 small" id="dep1" idxTimeInput="2" inputmode="tel"  autocomplete="off">
 								</div>
 							</div>
 
@@ -168,13 +189,13 @@
 							<div class="border-right pr-3 d-flex align-items-center bg-secondary text-white justify-content-center rounded">
 								<div class="form-group mr-1">
 									<label class="col-form-label mr-3 text-center w-100" for="arr2">Arrivée</label>
-									<input type="text" class="form-control hour _3 small" id="arr2" inputmode="tel"  autocomplete="off">
+									<input type="text" class="form-control hour _3 small" id="arr2" idxTimeInput="3" inputmode="tel" autocomplete="off">
 								</div>
 								
 								<div class="form-group" style="position:relative">
 									<a href="#config-preferences" tabindex="-1"><i class="material-icons notif-status-icon" data-toggle="tooltip" data-placement="right" title="Notifications désactivées">notifications_off</i></a>
 									<label class="col-form-label mr-3 text-center w-100" for="dep2">Départ</label>
-									<input type="text" class="form-control hour _4 small" id="dep2" inputmode="tel"  autocomplete="off">
+									<input type="text" class="form-control hour _4 small" id="dep2" idxTimeInput="4" inputmode="tel" autocomplete="off">
 								</div>
 							</div>
 							
@@ -389,7 +410,7 @@
 
 		</div>
 
-		<div class="toast" style="position: absolute; bottom: 10px; right: 15px;" data-delay="3500">
+		<div class="toast" style="position: absolute; bottom: 10px; right: 15px;">
 			<div class="toast-header">
 			  <div class="rounded mr-2 bg-success square" style="width:14px; height:14px"></div>
 			  <strong class="mr-auto title">Evenement</strong>

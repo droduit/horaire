@@ -38,8 +38,9 @@ function setLocalStorage(key, value, expires = null) {
     }
 
     try {
-        if(expires != undefined && expires != null) {
-            localStorage.setItem(key, JSON.stringify({value:value, expiration: Date.now() + expires*1000}));
+        if (expires != undefined && expires != null) {
+            let expirationTimestamp = expires < Date.now() ? Date.now() + expires*1000 : expires;
+            localStorage.setItem(key, JSON.stringify({value:value, expiration: expirationTimestamp}));
         } else {
             localStorage.setItem(key, value);
         }

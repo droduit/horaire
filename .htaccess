@@ -1,0 +1,6 @@
+RewriteEngine On    # Turn on the rewriting engine
+
+RewriteRule ^api(/?[\da-zA-Z_\-\/]*)$ src/api/api.php?r=$1 [NC,L]
+
+# https://stackoverflow.com/questions/4928228/basic-authentication-with-php-gives-an-endless-loop
+RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

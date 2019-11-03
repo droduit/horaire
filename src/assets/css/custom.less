@@ -112,8 +112,87 @@ h3.popover-header {
   transform: rotate(10deg);
 }
 
+
 .page[data-id="horaire"] {
   
+  #timeline {
+    @bg-timeline: #ccc;
+    @bg-point: #343a40;
+    @bg-point-prediction: #007bff; 
+    @bg-progression: #009688; //#4caf50;
+    @bg-progression-break: #9e9e9e;
+
+    @height-timeline: 10px;
+    @boldness-point: 0px;
+
+    display:none;
+    width: 98.35%;
+    margin-left: 4px;
+    background-color: @bg-timeline;
+    height: @height-timeline;
+    margin-bottom: 1rem;
+    margin-top: 2.8rem;
+    border-radius: 15px;
+    position: relative;
+    z-index: 1;
+
+    &.set {
+      display: block;
+    }
+    .point {
+      border-radius: 50%;
+      width: @height-timeline + @boldness-point;
+      height: @height-timeline + @boldness-point;
+      top: -@boldness-point / 2;
+      position: absolute;
+      background-color: fade(@bg-point, 70%);
+      cursor: pointer;
+      z-index: 3;
+    
+      &:hover {
+        width: @height-timeline + 2*@boldness-point + 2px;
+        height: @height-timeline + 2*@boldness-point + 2px;
+        top: -@boldness-point - 1px;
+        background-color: @bg-point;
+        .label-time {
+          font-size: .7rem;
+        }
+      }
+      .label-time {
+        position: absolute;
+        font-size: 0.65rem;
+        margin-left: -10px;
+        top: -20px;
+        color: @bg-point;
+        font-family: 'Open Sans',sans-serif;
+        font-weight: 600;
+      }
+
+      &.prediction {
+        background-color: @bg-point-prediction;
+        .label-time {
+          color: @bg-point-prediction;
+        }
+      }
+    }
+
+    .progression {
+      position: absolute;
+      height: @height-timeline;
+      background-color: @bg-progression;
+      border-radius: 6px;
+      z-index: 2;
+      
+      &.break {
+        background-color: @bg-progression-break;
+      }
+    }
+  }
+
+  .hour.highlight {
+    font-weight:bold;
+    color: black;
+  }
   .timer-timelapse-action {
   	transition: 0.15s linear all;
   }
@@ -230,7 +309,7 @@ h3.popover-header {
   }
 }
 
-.page[data-id="config-preferences"] {
+.page[data-id^="config-"] {
   .settings {
     > .item {
       vertical-align: middle;
@@ -252,6 +331,12 @@ h3.popover-header {
     	}
     	&.active .material-icons {
     		color: @brand-primary;
+      }
+      &.definitive-disabled {
+        cursor: not-allowed!important;
+        h6, .btn-toggle {
+          cursor: not-allowed!important;
+        }
       }
     }
   }
@@ -287,6 +372,9 @@ h3.popover-header {
     #pauseMidi {
       margin-top: 0.2rem!important;
       margin-bottom: 0.2rem!important;
+    }
+    #timeline.set {
+      display: none;
     }
   }
 

@@ -1,6 +1,6 @@
 /*! @preserve
  * bootbox.js
- * version: 5.1.1
+ * version: 5.3.2
  * author: Nick Payne <nick@kurai.co.uk>
  * license: MIT
  * http://bootboxjs.com/
@@ -19,49 +19,6 @@
   }
 }(this, function init($, undefined) {
   'use strict';
-
-  //  Polyfills Object.keys, if necessary.
-  //  @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object/keys
-  if (!Object.keys) {
-    Object.keys = (function () {
-      var hasOwnProperty = Object.prototype.hasOwnProperty,
-        hasDontEnumBug = !({ toString: null }).propertyIsEnumerable('toString'),
-        dontEnums = [
-          'toString',
-          'toLocaleString',
-          'valueOf',
-          'hasOwnProperty',
-          'isPrototypeOf',
-          'propertyIsEnumerable',
-          'constructor'
-        ],
-        dontEnumsLength = dontEnums.length;
-
-      return function (obj) {
-        if (typeof obj !== 'function' && (typeof obj !== 'object' || obj === null)) {
-          throw new TypeError('Object.keys called on non-object');
-        }
-
-        var result = [], prop, i;
-
-        for (prop in obj) {
-          if (hasOwnProperty.call(obj, prop)) {
-            result.push(prop);
-          }
-        }
-
-        if (hasDontEnumBug) {
-          for (i = 0; i < dontEnumsLength; i++) {
-            if (hasOwnProperty.call(obj, dontEnums[i])) {
-              result.push(dontEnums[i]);
-            }
-          }
-        }
-
-        return result;
-      };
-    }());
-  }
 
   var exports = {};
 
@@ -439,7 +396,10 @@
     dialog.on('click', '.modal-footer button:not(.disabled)', function (e) {
       var callbackKey = $(this).data('bb-handler');
 
-      processCallback(e, dialog, callbacks[callbackKey]);
+      if (callbackKey !== undefined) {
+        // Only process callbacks for buttons we recognize:
+        processCallback(e, dialog, callbacks[callbackKey]);
+     }
     });
 
     dialog.on('click', '.bootbox-close-button', function (e) {

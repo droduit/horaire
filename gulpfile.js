@@ -1,5 +1,5 @@
-// Requis
-var gulp = require('gulp');
+const gulp = require('gulp');
+const babel = require('gulp-babel');
 
 // Include plugins
 var plugins = require('gulp-load-plugins')(); // tous les plugins de package.json
@@ -64,12 +64,7 @@ gulp.task('js-clean-concat-minify', function() {
       path.dev.js + 'modules/holidayPlan.js' // Planificateur de vacances
     ])
     .pipe(plugins.concat('bundle.js'))
-    .pipe(plugins.babel({
-      presets: [['@babel/env', {
-        loose: true,
-        modules: false
-      }]]
-    }))
+    .pipe(babel())
     .pipe(plugins.uglify())
     .pipe(plugins.rename({suffix: '.min'}))
     .pipe(gulp.dest(path.prod.js));
@@ -77,12 +72,7 @@ gulp.task('js-clean-concat-minify', function() {
 
 gulp.task('js-clean-concat-minify-sw', function() {
   return gulp.src('./serviceWorker.js')
-    .pipe(plugins.babel({
-      presets: [['@babel/env', {
-        loose: true,
-        modules: false
-      }]]
-    }))
+    .pipe(babel())
     .pipe(plugins.uglify())
     .pipe(plugins.rename({suffix: '.min'}))
     .pipe(gulp.dest('./'));

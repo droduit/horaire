@@ -2,7 +2,9 @@
  * Page Horaire  ----------------------------------------------------------
  */
 // Heure maximal de fin du travail
-var END_WORKING_HOUR = 20;
+const END_WORKING_HOUR = 19;
+const MIN_BREAK_TIME_MIN = 30;
+const TIMESTAMP_EXPIRATION_INPUTS_HOURS = moment().endOf("day").add(3, "hours").valueOf();
 
 var timerTimelapse = false;
 
@@ -99,61 +101,106 @@ $(function(){
 			}
 		}
 	});
-	
-	$((isFilled("dep2") ? '#dep2' : '#arr1')).focus();
+
+	focusOnNextEmptyTimeInput();
+	timeline.create();
 	
 	$('body')
-	.on('keyup', 'input', function(e){
-		if($(this).val().length == 5) {
+	.on('keydown', 'input', function(e) {
+		if (!inputTime.isAcceptedKey(e)) {
+			//e.preventDefault();
+			return false;
+		}
+	})
+	.on('keyup', 'input', function(e) {
+		if ($(this).val().length == 5) {
 			if ($(this).attr("id") == "dailyWorkTime" || $(this).attr("id") == "previousOvertime") {
 				localStorage.setItem($(this).attr("id"), $(this).val());
 			} else {
-				setLocalStorage($(this).attr("id"), $(this).val(), 24*60*60*0.6);
+				setLocalStorage($(this).attr("id"), $(this).val(), TIMESTAMP_EXPIRATION_INPUTS_HOURS);
 			}
 
-			if($(this).is(".hour")) {
+			if ($(this).is(".hour")) {
 				var groupId = $(this).closest(".group").data("group");
-				if(typeof groupId == "undefined") return;
-				if(isFilled("arr"+groupId) && isFilled("dep"+groupId) && getTimeForInput("dep"+groupId) < getTimeForInput("arr"+groupId)) {
+				if (typeof groupId == "undefined") {
+					return;
+				}
+
+				if (keyboard.isNumber(e.keyCode)) {
+					var nextIdxTimeInput = parseInt($(this).attr("idxTimeInput")) + 1;
+					var nextTimeInput = $('.hour[idxTimeInput="'+nextIdxTimeInput+'"]');
+					if (nextTimeInput.length > 0 && nextTimeInput.val().length == 0) {
+						nextTimeInput.focus();
+					}
+				}
+
+				if (isFilled("arr"+groupId) && isFilled("dep"+groupId) && getTimeForInput("dep"+groupId) < getTimeForInput("arr"+groupId)) {
 					$('#dep'+groupId).val(minsToTime(getTimeForInput("arr"+groupId)+60));
 				}
+
 				processGroup(groupId);
+				timeline.create();
 			}
 		}
 	})
-	.on('keyup', '#arr1', function(){
-		if(isFilled("dep1") && isFilled("arr2") && isFilled("arr1")) {
+	.on('keyup', '#arr1', function(e) {
+		if (isFilled("dep1") && isFilled("arr2") && isFilled("arr1")) {
 			processBreakTime();
 			processGroup(2);
 			startTimerTimelapse();
 		}
 	})
-	.on('keyup', '#arr2, #dep1', function(){
-		if(isFilled("arr2") && isFilled("dep1")) {
-			if(getBreakTime() < 30) {
-				$('#arr2').val(minsToTime(getTimeForInput("dep1") + 30));
+	.on('keyup', '#arr2, #dep1', function(e) {
+		if (isFilled("arr2") && isFilled("dep1")) {
+			if (getBreakTime() < MIN_BREAK_TIME_MIN) {
+				$('#arr2').val(minsToTime(getTimeForInput("dep1") + MIN_BREAK_TIME_MIN));
 			}
 			processBreakTime();
 			startTimerTimelapse();
 		}
 	})
 	.on('keyup', '#previousOvertime', function() {
-		if(isFilled("previousOvertime")) {
+		if (isFilled("previousOvertime")) {
 			fillCurrentOvertime();
 			processOvertimeStats(getTimeForInput("previousOvertime"));
 			processFinalTime();
 		}
 	}).on('keyup', '#currentOvertime', function() {
-		if(isFilled("currentOvertime")) {
+		if (isFilled("currentOvertime")) {
 			processOvertimeStats(getTimeForInput("currentOvertime"));
 		}
 	});
 
+	let inputTime = {
+		isAcceptedKey: function(e) {
+			return keyboard.isNumber(e.keyCode) || keyboard.isTab(e.keyCode) || keyboard.isArrowsX(e.keyCode) || keyboard.isBackspace(e.keyCode)
+			|| keyboard.isCtrlA(e) || keyboard.isCtrlZ(e) || keyboard.isCtrlC(e) || keyboard.isCtrlV(e) || keyboard.isCtrlF5(e) || keyboard.isF5(e.keyCode)
+		},
+		isTriggerComputationKey: function(keyCode) {
+			return keyboard.isNumber(keyCode) || keyboard.isTab(keyCode)
+		}
+	};
+
+	let keyboard = {
+		isNumber: function(keyCode) { return (keyCode > 95 && keyCode < 106) || (keyCode > 47 && keyCode < 58) },
+		isTab: function(keyCode) { return keyCode == 9 },
+		isF5: function(keyCode) { return keyCode == 116 },
+		isArrowsX : function(keyCode) { return keyCode == 37 || keyCode == 39 },
+		isBackspace: function(keyCode) { return keyCode == 8 },
+		isCtrl : function(e) { return e.ctrlKey || e.metaKey },
+		isCtrlA: function(e) { return keyboard.isCtrl(e) && e.keyCode == 65 },
+		isCtrlZ: function(e) { return keyboard.isCtrl(e) && e.keyCode == 90 },
+		isCtrlC: function(e) { return keyboard.isCtrl(e) && e.keyCode == 67 },
+		isCtrlV: function(e) { return keyboard.isCtrl(e) && e.keyCode == 86 },
+		isCtrlF5: function(e) { return keyboard.isCtrl(e) && keyboard.isF5(e.keyCode) }
+	}
+
+
 	function getPublicHolidaysComingSoon() {
 		let comingPublicHolidays = [];
-		for(var i = 1; i < 14; ++i) {
+		for (var i = 1; i < 14; ++i) {
 			let day = moment().add(i, 'days');
-			if(publicHolidays.includes(day.format('YYYY-MM-DD'))) {
+			if (publicHolidays.includes(day.format('YYYY-MM-DD'))) {
 				comingPublicHolidays.push(day);
 			}
 		}
@@ -161,15 +208,15 @@ $(function(){
 	}
 
 	var comingPublicHolidays = getPublicHolidaysComingSoon();
-	if(comingPublicHolidays.length > 0) {
+	if (comingPublicHolidays.length > 0) {
 		var textHolidays = '';
 		getPublicHolidaysComingSoon().forEach( day => textHolidays += '<a href="#" data-date="'+day.format('YYYY-MM-DD')+'" class="badge badge-danger ml-1 publicHoliday">'+day.format('dddd DD MMMM')+"</a>" );
-		$('.page[data-id="horaire"]').append('<div class="alert alert-danger mt-2 mb-0 text-center p-2">Jours fériés '+textHolidays+'</div>');
+		$('.page[data-id="horaire"]').append('<div class="alert alert-danger mt-2 mb-0 text-center p-2">Prochains congés '+textHolidays+'</div>');
 	
 		$('.page[data-id="horaire"]').on('click', '.publicHoliday', function(){
 			var slctDay = $(this).data("date");
 			bootbox.alert({
-				title: "Jours fériés à venir",
+				title: "Congés à venir",
 				message: '<ul class="list-group">' +
   					publicHolidays
   					.filter(day => {
@@ -186,14 +233,60 @@ $(function(){
 
 	displayTimelapseBeforeHolidays();
 
+
+	// Affiche les timbrages en base de données s'ils existent
+	if(localStorage.getItem("username")) {
+		function getTimbragesFromDB() {
+			api.fetch('src/call_api.php?endpoint=user-storage/'+localStorage.getItem("coupling-code")+"&date="+moment().format("YYYY-MM-DD"), function(json){
+				if (json.timbrages) {
+					json.timbrages.split(",").forEach( (timbrage, index) => {
+						var hourElem = $('.hour[idxTimeInput="'+(++index)+'"]');
+						if (hourElem.length > 0) {
+							hourElem.val(timbrage).trigger("keyup");
+						}
+					});
+				}
+			});
+		}
+		getTimbragesFromDB();
+		setInterval(getTimbragesFromDB, 30*1000);
+	}
+
 });
+
+function focusOnNextEmptyTimeInput() {
+	var i;
+	for (i = 1; i <= parseInt($('.hour:last').attr("idxTimeInput")); ++i) {
+		if($('.hour[idxTimeInput="'+i+'"]').val().length == 5) {
+			continue;
+		}
+		break;
+	}
+	var inputToFocusOn = $('.hour[idxTimeInput="'+i+'"]');
+	if (inputToFocusOn.length > 0) {
+		inputToFocusOn.focus();
+	}
+}
 
 function displayTimelapseBeforeHolidays() {
 	if(localStorage.getItem("startHoliday") != null) {
+		let textTimelapseBeforeHolidays = "";
+
 		var holidaysStartingDay = moment(localStorage.getItem("startHoliday"));
+		var holidaysEndingDay = moment(localStorage.getItem("endHoliday"));
 		if(!moment().isAfter(holidaysStartingDay)) {
 			let nbDaysBeforeHolidays = holidaysStartingDay.diff(moment(), 'days') + 1;
-			let textTimelapseBeforeHolidays = 'Vos vacances commencent dans '+nbDaysBeforeHolidays+' jours.';
+			let nbDaysBeforeEndingHolidays = holidaysEndingDay.diff(moment(), 'days') + 1;
+			
+			textTimelapseBeforeHolidays = 'Vos vacances commencent dans '+nbDaysBeforeHolidays+' jours et finissent dans '+nbDaysBeforeEndingHolidays+' jours.';
+		} else {
+			if(moment().isBefore(holidaysEndingDay)) {
+				let nbDaysBeforeEndingHolidays = holidaysEndingDay.diff(moment(), 'days') + 1;
+				textTimelapseBeforeHolidays = 'Vos vacances finissent dans '+nbDaysBeforeEndingHolidays+' jours.';
+			}
+		}
+
+		if (textTimelapseBeforeHolidays != "") {
 			if($('.timelapseBeforeHolidays').length <= 0) {
 				$('.page[data-id="horaire"]').append('<div onclick="document.location=\'#holidayPlan\';" style="cursor:pointer" class="timelapseBeforeHolidays alert alert-success mt-2 text-center p-2"></div>');
 			} 
@@ -214,27 +307,32 @@ function askHoraire() {
 		closeButton:false,
 		animate:false,
 		buttons: {
-			confirm: { label: '<i class="material-icons" style="vertical-align:top">check</i>', callback: function() {
-				if($('#dailyWorkTime').val().length == 5 && getTimeForInput("dailyWorkTime") >= 60*1) {
-					localStorage.setItem("dailyWorkTime", $('#dailyWorkTime').val());
-					if(!localStorage.getItem('previousOvertime')) {
-						askOvertime();
+			confirm: {
+				label: '<i class="material-icons" style="vertical-align:top">check</i>',
+				callback: function() {
+					if ($('#dailyWorkTime').val().length == 5 && getTimeForInput("dailyWorkTime") >= 60*1) {
+						localStorage.setItem("dailyWorkTime", $('#dailyWorkTime').val());
+						if (!localStorage.getItem('previousOvertime')) {
+							askOvertime();
+						} else {
+							$('.hour[idxTimeInput=1]').focus();
+						}
+						processGroup(1);
+						processBreakTime();
+						processGroup(2);
+						processOvertimeStats(getTimeForInput("currentOvertime"));
+						timeline.create();
 					} else {
-						$('#arr1').focus();
+						return false;
 					}
-					processGroup(1);
-					processBreakTime();
-					processGroup(2);
-				} else {
-					return false;
 				}
-			}}
+			}
 		}
 	});
 	dialog.init(function(){
 		setTimeout(function(){
 			var cleaveDailyWorkTime = new Cleave('#dailyWorkTime', hourPattern);
-			$('#dailyWorkTime').focus().select().keyup(function(e){
+			$('#dailyWorkTime').focus().select().keyup(function(e) {
 				if(e.keyCode == 13)
 					$('button.bootbox-accept').click();
 			});
@@ -323,7 +421,7 @@ function processBreakTime() {
 function processFinalTime() {
 	if( isFilled("arr1") && isFilled("dep1") && isFilled("arr2") && isFilled("dep2") ) {
 		
-		var totalTime = getTimeForInput("dep2") - getTimeForInput("arr1") - getBreakTime();
+		var totalTime = getTotalTimeWorked();
 		
 		var color = totalTime >= getHoraireTime() ? 'success' : 'danger';
 		var sign = color == "success" ? '+' : '-';
@@ -342,12 +440,19 @@ function processFinalTime() {
 			comment = "";
 		}
 		
-		$(".final").removeClass("bg-danger bg-success").addClass("bg-"+color).html('<span><b class="badge badge-light position-absolute" style="left:6px; margin-top:3px">Temps total</b> '+minsToTime(totalTime)+" = "+minsToTime(getHoraireTime()) + " <b>" + sign + bonusMalus+'</b> '+comment+'</span>').show();
+		$(".final")
+			.removeClass("bg-danger bg-success")
+			.addClass("bg-"+color)
+			.html('<span><b class="badge badge-light position-absolute" style="left:6px; margin-top:3px">Temps total</b> '+minsToTime(totalTime)+" = "+minsToTime(getHoraireTime()) + " <b>" + sign + bonusMalus+'</b> '+comment+'</span>')
+			.show();
 		
-
 		var newHsupp = getTimeForInput("previousOvertime") + hsuppTime;
 		var signHSupp = newHsupp >= 0 ? "" : "- ";
-		$('#currentOvertime').val(signHSupp+minsToTime(newHsupp, true)).removeClass("bg-danger bg-success").addClass("bg-"+(newHsupp >= 0 ? "success" : "danger"));
+
+		$('#currentOvertime')
+			.val(signHSupp+minsToTime(newHsupp, true))
+			.removeClass("bg-danger bg-success")
+			.addClass("bg-"+(newHsupp >= 0 ? "success" : "danger"));
 		
 		processOvertimeStats(newHsupp);
 		
@@ -356,7 +461,10 @@ function processFinalTime() {
 		  .then(serviceWorkerRegistration => serviceWorkerRegistration.pushManager.getSubscription())
 		  .then(subscription => {
 			if (!subscription) return;
-			$.post("src/setEndingTime.php", { time: $('#dep2').val(), endpoint: subscription.endpoint }, function(ret) {
+			$.post("src/setEndingTime.php", {
+				time: $('#dep2').val(),
+				endpoint: subscription.endpoint
+			}, function(ret) {
 				//console.log(ret);
 			});
 		  });
@@ -367,7 +475,13 @@ function processFinalTime() {
 function fillCurrentOvertime() {
 	var newHsupp = getTimeForInput("previousOvertime") + getTimeForInput("bonusMalus");
 	var signHSupp = newHsupp >= 0 ? "" : "- ";
-	$('#currentOvertime').val(signHSupp+minsToTime(newHsupp, true)).removeClass("bg-danger bg-success").addClass("bg-"+(newHsupp >= 0 ? "success" : "danger"));
+
+	$('#currentOvertime')
+		.val(signHSupp+minsToTime(newHsupp, true))
+		.removeClass("bg-danger bg-success")
+		.addClass("bg-"+(newHsupp >= 0 ? "success" : "danger"));
+
+	localStorage.setItem("currentOvertime", $('#currentOvertime').val());
 }
 
 function processOvertimeStats(newHsupp) {
@@ -433,12 +547,13 @@ function refreshTimelapse() {
 		if(Math.abs(timelapseInSeconds) % 60 == 0 && expectedEndTime < currentTime && currentTime <= END_WORKING_HOUR*60) {
 			if(timelapseInSeconds < 0) {
 				$('.toast-body').html('+1 minute ajoutée au solde horaire !');
-				$('.toast').toast("show");
+				$('.toast').toast({delay:3500}).toast("show");
 			}
 
 			$('#dep2').val(minsToTime(currentTime)).trigger("keyup");
 			//processBreakTime();
 			//processGroup(2);
+			timeline.create();
 		}
 	} else { // Mise en pause du timer
 		clearInterval(timerTimelapse);
@@ -466,6 +581,163 @@ function startTimerTimelapse() {
 		}
 	}
 }
+
+var timeline = {
+	elem: $('#timeline'),
+	pointElem : $('<div class="point"><div class="label-time"></div></div>'),
+	progressionElem : $('<div class="progression progress-bar progress-bar-striped progress-bar-animated"></div>'),
+
+	create: function() {
+		this.clear();
+		this.points.compute();
+		this.progressions.compute();
+		this.addListeners();
+	},
+	// ------------------------------------
+	clear: function() {
+		this.elem.html("");
+	},
+	getTimeReference : function() {
+		return getTimeForValue($('.hour[idxTimeInput=1]').val());
+	},
+	getWidthOfBreaksInPercent : function() {
+		var lastIdxTimeInput = parseInt($('.hour[idxTimeInput]:last').attr("idxTimeInput"));
+		var totalWidthInPercent = 0;
+		for(var i = 2; i < lastIdxTimeInput; i += 2) {
+			if ($('.hour[idxTimeInput="'+i+'"]').val().length == 5 && $('.hour[idxTimeInput="'+(i+1)+'"]').val().length == 5) {
+				var timeEnd = getTimeForValue($('.hour[idxTimeInput="'+i+'"]').val());
+				var timeRestart = getTimeForValue($('.hour[idxTimeInput="'+(i+1)+'"]').val());
+				totalWidthInPercent += (timeRestart - timeEnd) / timeline.getWidth() * 100;
+			}
+		}
+		return totalWidthInPercent;
+	},
+	getWidth: function() {
+		return getHoraireTime() + Math.max(MIN_BREAK_TIME_MIN, getBreakTime());
+	},
+	addListeners: function() {
+		timeline.elem.find('.point').hover(function(){
+			$('.hour[idxTimeInput="'+$(this).attr("idxTimeInput")+'"]').toggleClass("highlight");
+		});
+	},
+	// ------------------------------------
+	points: {
+		add: function(pos, text, idxTimeInput, prediction=false) {
+			var firstIdxTimeInput = parseInt($('.hour[idxTimeInput]:first').attr("idxTimeInput"));
+			var lastIdxTimeInput = parseInt($('.hour[idxTimeInput]:last').attr("idxTimeInput"));
+
+			let newPoint = timeline.pointElem.clone()
+				.attr("idxTimeInput", idxTimeInput)
+				.css("left", pos+"%")
+				.find('.label-time').html(text)
+				.parent();
+
+			if (prediction) {
+				newPoint
+					.addClass("prediction")
+					.attr("data-toggle", "tooltip")
+					.attr("data-placement", "bottom")
+					.attr("title", "Prédiction avec pause de "+MIN_BREAK_TIME_MIN+" min.");
+			}
+
+			newPoint.appendTo(timeline.elem);
+
+			if (pos > 5) {
+				newPoint.css("margin-left", (-newPoint.width())+"px");
+			}
+			if (idxTimeInput != firstIdxTimeInput && idxTimeInput != lastIdxTimeInput) {
+				newPoint.find('.label-time').css("left", ((idxTimeInput%2 == 0 ? -1 : 1) * newPoint.width()) + "px");
+			}
+		},
+		addPrediction: function(pos, text, idxTimeInput) {
+			timeline.points.add(pos, text, idxTimeInput, true);
+		},
+
+		compute: function() {
+			var lastIdxTimeInput = parseInt($('.hour[idxTimeInput]:last').attr("idxTimeInput"));
+			$('.hour[idxTimeInput]').each(function(){
+				if ($(this).val().length == 5) {
+					
+					if ($(this).is("[idxTimeInput=1]")) {
+						timeline.elem.addClass("set");
+					} 
+
+					var timeCurrent = getTimeForValue($(this).val());
+					var xPos = (timeCurrent - timeline.getTimeReference()) / timeline.getWidth() * 100;
+					var textLabelTime = $(this).val();
+
+					timeline.points.add(Math.min(100, xPos), textLabelTime, $(this).attr("idxTimeInput")); 
+				}
+			});
+
+			var nbOfPoints = timeline.elem.find('.point').length;
+			if (nbOfPoints > 0 && nbOfPoints < 3) {
+				var minEndingTime = getTimeForValue($('.hour[idxTimeInput=1]').val()) + getHoraireTime() + MIN_BREAK_TIME_MIN;
+				timeline.points.addPrediction(100, minsToTime(minEndingTime), lastIdxTimeInput);
+			}
+		},
+		getWidthInPercent: function() {
+			return $('#timeline .point').first().width() / $('#timeline.set').width() * 100;
+		}
+	},
+	// ------------------------------------
+	progressions : {
+		add : function(xStart, width, extraClasses = null) {
+			let newProgression = timeline.progressionElem.clone();
+
+			if (extraClasses != null) {
+				newProgression.addClass(extraClasses);
+				if (extraClasses == "break") {
+					newProgression.removeClass("progress-bar-animated")
+						.attr("title", "Pause");
+				}
+			} else {
+				if (getCurrentTime() >= getExpectedEndTime()) {
+					newProgression.addClass("bg-success");
+				}
+			}
+
+			if (xStart > 0) {
+				xStart -= timeline.points.getWidthInPercent();
+				width += timeline.points.getWidthInPercent();
+			}
+
+			if (getCurrentTime() > END_WORKING_HOUR*60) {
+				newProgression.removeClass("progress-bar-animated");
+			}
+
+			newProgression.css({ width: Math.min(100, width)+"%", left: Math.max(0, xStart)+"%" });
+			newProgression.appendTo(timeline.elem);
+		},
+		addBreak: function(xFrom, xTo) {
+			var width = xTo - xFrom;
+			timeline.progressions.add(xFrom, width, "break");
+		}, 
+		compute: function() {
+			var lastIdxTimeInput = parseInt($('.hour[idxTimeInput]:last').attr("idxTimeInput"));
+
+			// Heure actuelle
+			let width = ( getCurrentTime() - timeline.getTimeReference() ) / timeline.getWidth() * 100;
+			if (width >= timeline.points.getWidthInPercent()) {
+				timeline.progressions.add(0, width);
+			}
+
+			// Pauses
+			for(var i = 2; i < lastIdxTimeInput; i += 2) {
+				if ($('.hour[idxTimeInput="'+i+'"]').val().length == 5 && $('.hour[idxTimeInput="'+(i+1)+'"]').val().length == 5) {
+					var timeEnd = getTimeForValue($('.hour[idxTimeInput="'+i+'"]').val());
+					var timeRestart = getTimeForValue($('.hour[idxTimeInput="'+(i+1)+'"]').val());
+					var xPosEnd = (timeEnd - timeline.getTimeReference()) / timeline.getWidth() * 100;
+					var xPosRestart = (timeRestart - timeline.getTimeReference()) / timeline.getWidth() * 100; 
+					
+					timeline.progressions.addBreak(xPosEnd, xPosRestart);
+				}
+			}
+		}
+	}
+
+};
+
 
 // Helpers
 function getTimeForInput(inputId) {
@@ -496,6 +768,20 @@ function getCurrentTime() {
 
 function getExpectedEndTime() {
 	return getTimeForInput("arr2") + (getHoraireTime() - getGroupTotalTime(1));
+}
+
+function getTotalTimeWorked() {
+	var timeWorked = 0;
+	var lastIdxTimeInput = parseInt($('.hour[idxTimeInput]:last').attr("idxTimeInput"));
+	for(var i = 1; i < lastIdxTimeInput; i += 2) {
+		if ($('.hour[idxTimeInput="'+i+'"]').val().length == 5 && $('.hour[idxTimeInput="'+(i+1)+'"]').val().length == 5) {
+			var interval = getTimeForValue($('.hour[idxTimeInput="'+(i+1)+'"]').val()) - getTimeForValue($('.hour[idxTimeInput="'+i+'"]').val());
+			console.log("["+(i+1)+"-"+i+"]", interval);
+			timeWorked += interval;
+		}
+	}
+	console.log("total", timeWorked);
+	return timeWorked;
 }
 
 function getGroupTotalTime(groupId) {

@@ -18,21 +18,20 @@
   "homepage": "https://github.com/droduit/horaire#readme",
   "devDependencies": {
     "@babel/core": "^7.4.4",
-    "@babel/preset-env": "^7.4.4",
+    "@babel/preset-env": "^7.6.3",
     "babel-core": "^6.26.3",
-    "gulp": "^4.0.1",
-    "gulp-autoprefixer": "latest",
+    "gulp": "^4.0.2",
+    "gulp-autoprefixer": "^7.0.1",
     "gulp-babel": "^8.0.0",
-    "gulp-clean": "latest",
-    "gulp-concat": "latest",
-    "gulp-cssbeautify": "latest",
-    "gulp-csscomb": "latest",
-    "gulp-csso": "latest",
-    "gulp-less": "latest",
-    "gulp-load-plugins": "latest",
-    "gulp-php2html": "latest",
-    "gulp-rename": "latest",
-    "gulp-uglify": "latest"
+    "gulp-clean": "^0.4.0",
+    "gulp-concat": "^2.6.1",
+    "gulp-cssbeautify": "^2.0.0",
+    "gulp-csscomb": "^3.0.8",
+    "gulp-csso": "^3.0.1",
+    "gulp-less": "^4.0.1",
+    "gulp-load-plugins": "^2.0.1",
+    "gulp-rename": "^1.4.0",
+    "gulp-uglify": "^3.0.2"
   },
   "dependencies": {
     "gulp-htmlmin": "^5.0.1"

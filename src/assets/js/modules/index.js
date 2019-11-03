@@ -25,11 +25,11 @@ $(function(){
 	});
 
 	$('#config').click(function(){
-		nav.switchPage("config", "#config", {previousPage: "Home", currentPage:"Configuration"}, "btn-back-navbar");
+		nav.switchPage("config", "#config", {previousPage: "Home", currentPage:"Réglages"}, "btn-back-navbar");
 	});
 
 	$('.page[data-id="config"] #pills-tab a').click(function(){
-		let state = {previousPage: "Configuration", currentPage:$(this).find("span").text()};
+		let state = {previousPage: "Réglages", currentPage:$(this).find("span").text()};
 		nav.switchPage($(this).attr("href").replace("#", ""), $(this).attr("href"), state, "btn-back-navbar");
 	});
 
@@ -51,12 +51,18 @@ $(function(){
 				gm.triggerActions("call1");
 			}
 			localStorage.setItem("ip", data.ip);
+			
+			user.register();
 		});
 	} else {
 		gm.triggerActions("call2");
 	}
 
-	$('[data-toggle="tooltip"]').tooltip();
+	if(!localStorage.getItem("version")) {
+		user.register();
+	}
+
+	$('body').tooltip({selector:'[data-toggle="tooltip"]'});
 });
 
 window.onpopstate = function(event) {
@@ -103,6 +109,20 @@ const nav = {
 	loadPageFromHistory: function() {
 		var hash = document.location.hash;
 		var pageId;
+
+		if (hash == "#admin") {
+			localStorage.setItem("isAdmin", true);
+			document.location = '';
+		} else if (hash.startsWith("#username=")) {
+			var username = hash.replace("#username=", "");
+			if (username.length > 0) {
+				localStorage.setItem("username", username);
+				user.register();
+				document.location.hash = "";
+				hash = "";
+			}
+		}
+
 		if(hash.length > 1) {
 			pageId = hash.replace("#", "");
 			var idNavToDisplay = pageId.indexOf("config") > -1 ? "btn-back-navbar" : "main-navbar";
@@ -125,8 +145,10 @@ const gm = {
 			return;
 		}
 		if($('#page-picker .dropdown-item.gm').length <= 0) {
-			gm.addMenuItems();
-			gm.loadModules();
+			if(localStorage.getItem("isAdmin")) {
+				gm.addMenuItems();
+				gm.loadModules();
+			}
 			gm.disableNotifications();
 		}
 	},
@@ -147,15 +169,39 @@ const gm = {
 			return;
 		}
 		$('#enable_notifications')
-			.addClass("disabled gm").removeClass("active")
+			.addClass("disabled gm")
+			.removeClass("active")
 			.before(
 				'<i class="material-icons text-danger warning" data-toggle="popover" '+
 				'title="Désactivé par le GM avec ce navigateur" data-content="<small>Le firewall du GM bloque les requêtes du service Google Cloud Messaging utilisé par l\'API webpush (Se voit en vérifiant le Connection State à l\'adresse chrome://gcm-internals/). Il faut alors utiliser <a href=\'https://www.mozilla.org/fr/firefox/new/\' target=\'_blank\'>Firefox</a> pour profiter de cette fonctionnalité (puisque les navigateurs utilisent des services de cloud messaging différents, et celui de Firefox n\'est pas bloqué).</small>" '+
 				'data-trigger="hover" data-placement="bottom" data-container=".page[data-id=config-preferences]" '+
 				'data-html="true">warning</i>')
 			.closest('.item')
-			.removeClass("active").addClass("disabled definitive-disabled");
+			.removeClass("active")
+			.addClass("definitive-disabled");
 		$('.warning').popover("show");
 		$('#'+$(".warning").attr("aria-describedby")).css({maxWidth:"320px", zIndex:"9"});
 	}
 };
+
+const user = {
+	register : function() {
+		fetch('src/call_api.php?endpoint=users', {
+	      method: 'POST',
+	      body: JSON.stringify({
+	      	ipv4 : localStorage.getItem("ip"),
+	      	couplingCode : localStorage.getItem("coupling-code"),
+	      	username : localStorage.getItem("username") 
+	      })
+	    });
+	}
+}
+
+const api = {
+	fetch: function(url, callback) {
+		fetch(url)
+		.then(response => response.ok ? response.json() : Promise.reject({err: response.status}))
+		.then(json => callback(json))
+		.catch(error => console.log("Request failed", error));	
+	}
+}

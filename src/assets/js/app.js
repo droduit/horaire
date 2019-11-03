@@ -2,7 +2,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   var applicationServerKey = null;
   let isPushEnabled = false;
-  let newWorker;
   const notifSwitch = $('#enable_notifications');
 
   $.get('src/keys.php', { json:true }, function(key) {
@@ -15,11 +14,6 @@ document.addEventListener('DOMContentLoaded', () => {
       } else {
         push_subscribe();
       }
-    });
-
-    // Update service worker
-    $('body').on('click', '#update-sw', function(){
-        newWorker.postMessage({ action: 'skipWaiting' });
     });
 
     // Notifications ------------------------------------------
@@ -47,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			.then(reg => {
 				console.log('[SW] Service worker has been registered');
 				push_updateSubscription();
-        handleUpdate(reg);
 			}, e => {
         changeNotificationSwitchState('incompatible');
       });
@@ -62,28 +55,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 	});
 
-  // Permet de notifier l'utilisateur qu'il y a une mise à jour.
-  // On pourrait tout aussi bien mettre à jour directement le sw
-  // sans notification en mettant self.skipWaiting() dans l'install du sw.
-  function handleUpdate(reg) {
-    reg.addEventListener('updatefound', () => {
-      // An updated service worker has appeared in reg.installing!
-      newWorker = reg.installing;
-      newWorker.addEventListener('statechange', () => {
-        // Has service worker state changed?
-        switch (newWorker.state) {
-          case 'installed':
-            // There is a new service worker available, show the notification
-            if (navigator.serviceWorker.controller) {
-              $('.toast .toast-header').hide();
-              $('.toast-body').html('<div class="d-flex"><div class="mr-2">Nouvelle version disponible.</div> <a href="#" id="update-sw" class="font-weight-bold">Mettre à jour</a></div>');
-              $('.toast').toast({autohide:false}).toast("show");
-            }
-            break;
-        }
-      });
-    });
-  }
 
   function changeNotificationSwitchState(state) {
     var notificationParamRow = notifSwitch.closest(".item");
@@ -91,7 +62,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     $('.loader-notification').remove();
 
-    notifStatusIcon.text("notifications_off").removeAttr("title").attr("data-original-title", "Notifications désactivées").removeClass("active");
+    notifStatusIcon
+      .text("notifications_off")
+      .removeAttr("title")
+      .attr("data-original-title", "Notifications désactivées")
+      .removeClass("active");
 
     switch (state) {
       case 'enabled':
@@ -100,6 +75,8 @@ document.addEventListener('DOMContentLoaded', () => {
           notificationParamRow.removeClass("disabled");
           notifStatusIcon.text("notifications_active").removeAttr("title").attr("data-original-title", "Notifications activées").addClass("active");
           isPushEnabled = true;
+        } else {
+          notificationParamRow.addClass("disabled");
         }
         break;
 
@@ -248,14 +225,16 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function push_sendSubscriptionToServer(subscription, method) {
+
+    let bodyContent = {
+      "subscription" : subscription,
+      "ipv4" : localStorage.getItem("ip"),
+      "couplingCode" : localStorage.getItem("coupling-code")
+    };
+
     return fetch('src/subscription.php', {
       method,
-      body: btoa(JSON.stringify(subscription)) /*JSON.stringify({
-        endpoint: subscription.endpoint,
-        publicKey: key ? btoa(String.fromCharCode.apply(null, new Uint8Array(key))) : null,
-        authToken: token ? btoa(String.fromCharCode.apply(null, new Uint8Array(token))) : null,
-        contentEncoding,
-      } ) */
+      body: JSON.stringify(bodyContent)
     }).then(() => subscription);
   }
 

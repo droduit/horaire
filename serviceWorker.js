@@ -7,7 +7,7 @@ self.addEventListener("install", function (event) {
   console.log("[PWA Builder] Install Event processing");
 
   // Met à jour automatiquement lorsque le sw a changé
-  //self.skipWaiting();
+  self.skipWaiting();
 
   event.waitUntil(
     caches.open(CACHE).then(function (cache) {
@@ -33,6 +33,10 @@ self.addEventListener('message', function (event) {
 self.addEventListener("fetch", function (event) { 
   if (event.request.method !== "GET") return;
 
+  if ( event.request.url.endsWith("version") ) {
+      return false;
+  }
+
   event.respondWith(
     fromCache(event.request).then(
       function (response) {
@@ -42,6 +46,9 @@ self.addEventListener("fetch", function (event) {
         // file to use the next time we show view
         event.waitUntil(
           fetch(event.request).then(function (response) {
+            // console.log("fetch from cache: request", event.request);
+            // console.log("fetch from cache: response", response);
+
             return updateCache(event.request, response);
           })
         );
@@ -52,6 +59,9 @@ self.addEventListener("fetch", function (event) {
         // The response was not found in the cache so we look for it on the server
         return fetch(event.request)
           .then(function (response) {
+            //console.log("fetch from server: request", event.request);
+            //console.log("fetch from server: response", response.clone());
+            
             // If request was success, add or update it in the cache
             event.waitUntil(updateCache(event.request, response.clone()));
 
