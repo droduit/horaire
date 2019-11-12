@@ -211,7 +211,7 @@ $(function(){
 	if (comingPublicHolidays.length > 0) {
 		var textHolidays = '';
 		getPublicHolidaysComingSoon().forEach( day => textHolidays += '<a href="#" data-date="'+day.format('YYYY-MM-DD')+'" class="badge badge-danger ml-1 publicHoliday">'+day.format('dddd DD MMMM')+"</a>" );
-		$('.page[data-id="horaire"]').append('<div class="alert alert-danger mt-2 mb-0 text-center p-2">Prochains congés '+textHolidays+'</div>');
+		$('.page[data-id="horaire"]').append('<div id="box-holidays" class="alert alert-danger mt-2 mb-0 text-center p-2">Prochains congés '+textHolidays+'</div>');
 	
 		$('.page[data-id="horaire"]').on('click', '.publicHoliday', function(){
 			var slctDay = $(this).data("date");
@@ -237,7 +237,7 @@ $(function(){
 	  					})
 	  					.join("")
   					+ '</ul>',
-				size: "small",
+				size: "medium",
 				scrollable: true
 			});
 		});

@@ -7,7 +7,7 @@ const
 		'2019-05-30',
 		'2019-06-10', '2019-06-20',
 		'2019-08-01', '2019-08-15',
-		'2019-11-01',
+		'2019-11-15',
 		{date:'2019-12-24', morning:false, afternoon:true},	'2019-12-25', '2019-12-26', {date:'2019-12-31', morning:false, afternoon:true},
 
 		'2020-01-01', '2020-01-02'
@@ -28,8 +28,6 @@ const
 		chars : [..."abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNPQRSTUVWXYZ123456789"],
 		getString : length => [...Array(length)].map(_ => random.chars[Math.random() * random.chars.length|0]).join('')
 	},
-
-
 
 	api = ( (baseUrl) => {
 		'use strict';

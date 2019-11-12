@@ -58,9 +58,7 @@ $(function(){
 	};
 	updateApp();
 
-	$('.update-version').click(_ => {
-		updateApp(true);
-	});
+	$('.update-version').click(_ => updateApp(true));
 	// ---------------------------------------------------------
 
 
