@@ -80,13 +80,9 @@
 
 			<!-- ## start preferences ## -->
 			<div class="page" data-id="config-preferences">
+
+				<h3 class="text-dark">Général</h3>
 				<div class="list-group settings">
-				  	<div class="item list-group-item list-group-item-action py-2 px-2 d-flex">
-					    <div class="mr-auto"><h6><i class="material-icons">timer</i> Afficher un timer du temps restant</h6></div>
-				    	<button type="button" id="display_timelapse" default-value="true" class="btn btn-sm btn-toggle" data-toggle="button" aria-pressed="false">
-				    		<div class="handle"></div>
-				    	</button>
-				  	</div>
 					<div class="item list-group-item list-group-item-action py-2 px-2 d-flex">
 					    <div class="mr-auto">
 					    	<h6><i class="material-icons">notifications_active</i> <span class="text">Activer les notifications push</span><small></small></h6>
@@ -95,7 +91,24 @@
 					    	<div class="handle"></div>
 					    </button>
 				  	</div>
-			  </div>
+			  	</div>
+
+			  	<h3 class="mt-4 text-dark">Horaire</h3>
+			  	<div class="list-group settings">
+			  		<div class="item list-group-item list-group-item-action py-2 px-2 d-flex pc_only">
+					    <div class="mr-auto"><h6><i class="material-icons">linear_scale</i> Afficher la ligne du temps</h6></div>
+				    	<button type="button" id="display_timeline" default-value="true" class="btn btn-sm btn-toggle" data-toggle="button" aria-pressed="false">
+				    		<div class="handle"></div>
+				    	</button>
+				  	</div>
+
+				  	<div class="item list-group-item list-group-item-action py-2 px-2 d-flex">
+					    <div class="mr-auto"><h6><i class="material-icons">timer</i> Afficher un timer du temps restant</h6></div>
+				    	<button type="button" id="display_timelapse" default-value="true" class="btn btn-sm btn-toggle" data-toggle="button" aria-pressed="false">
+				    		<div class="handle"></div>
+				    	</button>
+				  	</div>
+			  	</div>
 	  		</div>
 		  	<!-- ## start preferences ## -->
 
@@ -130,16 +143,19 @@
 			<!-- ## start config-storage ## -->
 			<div class="page" data-id="config-storage">
 				<div class="list-group settings">
-				  	<div class="item list-group-item py-2 px-2 d-flex disabled bg-light">
-					    <div class="mr-auto"><h6>Version de l'application</h6></div>
-				    	<div id="version" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
+				  	<div class="item list-group-item py-2 px-2 d-flex disabled bg-light" style="pointer-events: all; cursor:default">
+					   <div class="mr-auto"><h6>Version de l'application</h6></div>
+				    	<div id="version" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700; display:flex; align-items: center">
+				    		<span>1.0.0</span>
+				    		<i class="material-icons text-dark update-version ml-1" style="font-size:16px; font-weight: 700; cursor: pointer" title="Vérifier si une mise à jour existe">cached</i>
+				    	</div>
 				  	</div>
 				  	<div class="item list-group-item py-2 px-2 d-flex disabled bg-light">
-					    <div class="mr-auto"><h6>Identifiant unique</h6></div>
+					   <div class="mr-auto"><h6>Identifiant unique</h6></div>
 				    	<div class="coupling-code" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
 				  	</div>
 				  	<div class="item list-group-item py-2 px-2 disabled bg-light" id="config-username" style="display:none">
-					    <div class="mr-auto"><h6>Utilisateur lié</h6></div>
+					   <div class="mr-auto"><h6>Utilisateur lié</h6></div>
 				    	<div class="username" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
 				  	</div>
 			  	</div>
@@ -267,13 +283,13 @@
 							<span class="input-group-text">De</span>
 						</div>
 						
-						<input type="text" aria-label="First name" class="form-control localStorage" data-min-length-localStorage="2" placeholder="Origine" id="flight-origin" list="location" autocomplete="off">
+						<input type="text" aria-label="Origine" class="form-control localStorage" data-min-length-localStorage="2" placeholder="Origine" id="flight-origin" list="location" autocomplete="off">
 						
 						<div class="input-group-prepend">
 							<span class="input-group-text">à</span>
 						</div>
 						
-						<input type="text" aria-label="Last name" class="form-control localStorage" data-min-length-localStorage="2" placeholder="Destination" id="flight-dest" list="location">
+						<input type="text" aria-label="Destination" class="form-control localStorage" data-min-length-localStorage="2" placeholder="Destination" id="flight-dest" list="location">
 
 						<div class="input-group-append" style="display:none">
 						  	<button class="btn input-group-text btn-default border dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Aller retour</button>

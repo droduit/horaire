@@ -107,7 +107,7 @@ $(function(){
 	
 	$('body')
 	.on('keydown', 'input', function(e) {
-		if (!inputTime.isAcceptedKey(e)) {
+		if ($(this).is(".hour") && !inputTime.isAcceptedKey(e)) {
 			//e.preventDefault();
 			return false;
 		}
@@ -200,7 +200,7 @@ $(function(){
 		let comingPublicHolidays = [];
 		for (var i = 1; i < 14; ++i) {
 			let day = moment().add(i, 'days');
-			if (publicHolidays.includes(day.format('YYYY-MM-DD'))) {
+			if (publicHolidays.map(item => item.date).includes(day.format('YYYY-MM-DD'))) {
 				comingPublicHolidays.push(day);
 			}
 		}
@@ -219,11 +219,23 @@ $(function(){
 				title: "Congés à venir",
 				message: '<ul class="list-group">' +
   					publicHolidays
-  					.filter(day => {
-  						let momentDay = moment(day);
-  						return momentDay.isAfter(moment()) && momentDay.isBefore(moment(moment().get('year')+'-01-03').add(1, 'years'));
-  					})
-  					.map(x => { return '<li class="list-group-item py-1 '+(moment(x).isSame(moment(slctDay)) ? 'active' : '')+'">'+moment(x).format("dddd, DD MMMM YYYY")+'</li>'; }).join("")
+	  					.filter(item => {
+	  						let momentDay = moment(item.date);
+	  						return momentDay.isAfter(moment()) && momentDay.isBefore(moment(moment().get('year')+'-01-03').add(1, 'years'));
+	  					})
+	  					.map(x => { 
+	  						var remarque = '';
+	  						if (!x.afternoon) {
+	  							remarque = ' (Matin)';
+	  						}
+	  						if (!x.morning) {
+	  							remarque = ' (Après-midi)';
+	  						}
+	  						return '<li class="list-group-item py-1 '+(moment(x.date).isSame(moment(slctDay)) ? 'active' : '')+'">'+
+	  									moment(x.date).format("dddd, DD MMMM YYYY")+remarque
+	  								'</li>';
+	  					})
+	  					.join("")
   					+ '</ul>',
 				size: "small",
 				scrollable: true
@@ -589,10 +601,14 @@ var timeline = {
 	progressionElem : $('<div class="progression progress-bar progress-bar-striped progress-bar-animated"></div>'),
 
 	create: function() {
-		this.clear();
-		this.points.compute();
-		this.progressions.compute();
-		this.addListeners();
+		if (localStorage.getItem("display_timeline") == "true") {
+			this.clear();
+			this.points.compute();
+			this.progressions.compute();
+			this.addListeners();
+		} else {
+			timeline.elem.removeClass("set");
+		} 
 	},
 	// ------------------------------------
 	clear: function() {

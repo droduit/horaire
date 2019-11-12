@@ -411,9 +411,19 @@ h3.popover-header {
 }
 
 @media screen and (max-width: 498px) {
-.page[data-id="holidayPlan"] {
+  .page[data-id="holidayPlan"] {
     & .vacancesStats {
       margin-top: 6px;
     }
   }
+
+  .page[data-id^="config-"] {
+    h3 {
+      text-align: center
+    }
+  }
+}
+
+@media (pointer:coarse) { 
+  .pc_only { display:none!important; }
 }

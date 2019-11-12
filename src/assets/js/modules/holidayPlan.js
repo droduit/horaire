@@ -39,8 +39,13 @@ var picker = new Lightpick({
 				} else {
 					counterDays.weekenddays++;
 				}
-				if(publicHolidays.includes(start.format('YYYY-MM-DD'))) {
-					counterDays.publicHolidays++;
+				if(publicHolidays.map(item => item.date).includes(start.format('YYYY-MM-DD'))) {
+					var dayProperties = publicHolidays.filter(item => item.date == start.format('YYYY-MM-DD'))[0];
+					if (dayProperties.morning && dayProperties.afternoon) {
+						counterDays.publicHolidays++;
+					} else {
+						counterDays.publicHolidays += 0.5;
+					}
 				}
 				start = moment(start, 'YYYY-MM-DD').add(1, 'days'); 
 			}
@@ -200,7 +205,7 @@ $(function(){
 	$('#flight-search').submit(function(){
 		var origin = $('#flight-origin').val();
 		var dest = $('#flight-dest').val();
-		window.open('https://www.momondo.ch/flight-search/'+origin+'-'+dest+'/'+localStorage.getItem("startHoliday")+'/'+localStorage.getItem("endHoliday")+'?sort=happinessScore_b');
+		window.open('https://www.momondo.fr/flight-search/'+origin+'-'+dest+'/'+localStorage.getItem("startHoliday")+'/'+localStorage.getItem("endHoliday")+'?sort=happinessScore_b');
 		return false;
 	});
 

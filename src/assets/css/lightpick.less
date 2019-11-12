@@ -179,6 +179,8 @@
 .lightpick__day.is-user-disabled {
     color: #d21818;
     font-weight: bold;
+    flex-flow: column;
+    padding-top: 12px;
 }
 .lightpick__day.is-weekend {
     opacity: 0.38;
@@ -292,6 +294,25 @@
     border-radius: 20px;
     margin-right: 6px
 }
+
+.lightpick__day {
+    .time-slots {
+        display: flex;
+        width: 70%;
+        margin: auto;
+        margin-top: 0;
+    }
+    .half-day.slot {
+        width: 48%;
+        height: 3px;
+        background-color: #ccc;
+        border-radius: 5px;
+        &.active {
+            background-color: @lp_publicHolidaysColor;
+        }
+    }
+}
+
 
 @media screen and (max-width: 700px) {
     .lightpick, .lightpick__inner, .lightpick__months, .lightpick__month {

@@ -4,35 +4,62 @@
 $(function(){
 
 	// Gestion de la version -----------------------------------
-	$.get('version', (version) => {
-		const VERSION = version;
+	const updateApp = (withFeedback = false) => {
 
-		if (localStorage.getItem("appUpdated") == VERSION) {
-			showToastUpdate("done");
-			localStorage.removeItem("appUpdated");
+		if (withFeedback) {
+			bootbox.dialog({ 
+			    message: '<div class="text-center"><img src="src/assets/img/loader-info.svg" width="24px"> Recherche d\'une version plus récente...</div>', 
+			    closeButton: false 
+			});
 		}
 
-		if (localStorage.getItem("version")) {
-			if (VERSION != localStorage.getItem("version")) {
+		fetch("version", {cache: "no-cache"})
+		.then(response => response.text())
+		.then(version => {
 
-				bootbox.dialog({ 
-				    message: '<div class="text-center"><img src="src/assets/img/loader-info.svg" width="24px"> Mise à jour...</div>', 
-				    closeButton: false 
-				});
-
-				caches.keys().then( keyList => keyList.map(key => caches.delete(key)));
-				localStorage.setItem("version", VERSION);
-				localStorage.setItem("appUpdated", VERSION);
-
-				setTimeout(function(){
-					document.location = '';
-				}, 500);
+			if (localStorage.getItem("appUpdated") == version) {
+				showToastUpdate("done");
+				localStorage.removeItem("appUpdated");
 			}
-		} else {
-			localStorage.setItem("version", VERSION);
-		}
 
-		$('#version').html(localStorage.getItem("version"));
+			if (localStorage.getItem("version")) {
+				if (version != localStorage.getItem("version")) {
+					bootbox.hideAll();
+
+					bootbox.dialog({ 
+					    message: '<div class="text-center"><img src="src/assets/img/loader-info.svg" width="24px"> Mise à jour...</div>', 
+					    closeButton: false 
+					});
+
+					caches.keys().then( keyList => keyList.map(key => caches.delete(key)));
+					localStorage.setItem("version", version);
+					localStorage.setItem("appUpdated", version);
+
+					setTimeout(function(){
+						document.location = '';
+					}, 500);
+				} else {
+					if (withFeedback) {
+						setTimeout(() => {
+							bootbox.hideAll();
+							bootbox.dialog({ 
+							    message: '<div class="text-center"><i class="material-icons mr-1 text-success" style="vertical-align:bottom">check</i> Votre version est à jour.</div>'
+							});
+						}, 700);
+					}
+				}
+			} else {
+				localStorage.setItem("version", version);
+			}
+
+			$('#version span').html(localStorage.getItem("version"));
+		});
+
+	};
+	updateApp();
+
+	$('.update-version').click(_ => {
+		updateApp(true);
 	});
 	// ---------------------------------------------------------
 
@@ -53,7 +80,17 @@ $(function(){
 	.click(function(){
 		var isEnabled = !$(this).is(".active");
 		localStorage.setItem($(this).attr("id"), isEnabled);
-		startTimerTimelapse();
+
+		switch ($(this).attr("id")) {
+			case "display_timelapse":
+				startTimerTimelapse();
+				break;
+			case "display_timeline":
+				timeline.create();
+				break;
+			default:
+				break;
+		}
 	});
 
 	$('.settings .item').click(function(e){
@@ -81,13 +118,13 @@ $(function(){
 
 	// --- Config - Device coupling 
 	if(!localStorage.getItem("coupling-code")) {
-		localStorage.setItem("coupling-code", Math.random().toString(36).substring(4, 15));
+		localStorage.setItem("coupling-code", random.getString(10));
 	}
 	$("input.coupling-code").val(localStorage.getItem("coupling-code"));
 	$("div.coupling-code").html(localStorage.getItem("coupling-code"));
 	
 	$('#renew-coupling-code').click(function(){
-		localStorage.setItem("coupling-code", Math.random().toString(36).substring(4, 15));
+		localStorage.setItem("coupling-code", random.getString(10));
 		$("input.coupling-code").val(localStorage.getItem("coupling-code"));
 		$("div.coupling-code").html(localStorage.getItem("coupling-code"));
 	});

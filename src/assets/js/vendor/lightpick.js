@@ -146,6 +146,13 @@
                     //day.className.push('is-disabled');
                     day.className.push('is-user-disabled');
                 }
+                else if (opts.disableDates[i].hasOwnProperty('date') && moment(opts.disableDates[i].date).isValid() && moment(opts.disableDates[i].date).isSame(date, 'day')) {
+                    day.className.push('is-user-disabled');
+                    if (!opts.disableDates[i].morning || !opts.disableDates[i].afternoon) {
+                        day.className.push('half-day');
+                    }
+                    day.disabledProperties = opts.disableDates[i];
+                }
 
                 if (day.className.indexOf('is-disabled') >= 0) {
 
@@ -258,10 +265,41 @@
             day.className.splice(day.className.indexOf('is-available'), 1);
         }
 
+        var htmlContent = date.get('date');
+        var title = '';
+        if (day.className.includes('is-user-disabled')) {
+            var morningClass = 'active',
+                afternoonClass = 'active';
+
+            if (day.className.includes('half-day')) {
+                if (!day.disabledProperties.morning) {
+                    morningClass = '';
+                    title = 'Congé l\'après-midi';
+                }
+
+                if (!day.disabledProperties.afternoon) {
+                    afternoonClass = '';
+                    title = 'Congé le matin';
+                }   
+            }
+
+            if(afternoonClass == 'active' && morningClass == 'active') {
+                title = 'Congé toute la journée';
+            }
+
+            htmlContent+= '<div class="time-slots">';
+            htmlContent+=   '<div class="half-day slot morning '+morningClass+'" style="margin-right: 2px;"></div>';
+            htmlContent+=   '<div class="half-day slot afternoon '+afternoonClass+'"></div>';
+            htmlContent+= '</div>';
+        }
+
         var div = document.createElement('div');
         div.className = day.className.join(' ');
-        div.innerHTML = date.get('date');
+        div.innerHTML = htmlContent;
         div.setAttribute('data-time', day.time);
+        if (title.length > 0) {
+            div.setAttribute("title", title);
+        }
 
         return div.outerHTML;
     },
