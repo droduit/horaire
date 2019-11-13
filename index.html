@@ -71,7 +71,7 @@
 				  <a href="#config-preferences" class="list-group-item list-group-item-action">
 				  	<i class="material-icons mr-1" style="vertical-align:bottom">star</i> <span>Préférences</span>
 				  </a>
-				  <a href="#config-coupling" class="list-group-item list-group-item-action" style="display:none">
+				  <a href="#config-coupling" class="list-group-item list-group-item-action">
 				  	<i class="material-icons mr-1" style="vertical-align:bottom">phonelink</i> <span>Couplage avec un appareil</span>
 				  </a>
 			  	</div>
@@ -115,26 +115,30 @@
 		  	<!-- ## start coupling ## -->
 			<div class="page" data-id="config-coupling">
 				<div class="card">
-					<h5 class="card-header">Code de couplage</h5>
+					<h5 class="card-header">Code de couplage de cette session</h5>
 					<div class="card-body">
 						<div class="input-group">
-						  <input type="text" class="form-control coupling-code" autocomplete="off" readonly value="">
-						  <div class="input-group-append">
-						    <button class="btn btn-secondary py-0 d-flex" type="button" id="renew-coupling-code"><i class="material-icons">autorenew</i></button>
-						  </div>
+						  	<input type="text" class="form-control coupling-code" autocomplete="off" readonly value="">
+							<div class="input-group-append">
+								<button class="btn btn-secondary py-0 d-flex" type="button" id="renew-coupling-code"><i class="material-icons">autorenew</i></button>
+						  	</div>
 						</div>
 					</div>
 				</div>
 
 				<div class="card mt-3">
-					<h5 class="card-header">Coupler avec un appareil</h5>
+					<h5 class="card-header">Se coupler avec un autre profil<br><small style="font-size:0.8rem">Permet de remplacer la session courante par celle utilisée avec un autre profil</small></h5>
+					
 					<div class="card-body">
-						<div class="input-group">
-						  <input type="text" class="form-control" id="user-coupling-code" autocomplete="off" placeholder="Entrez le code de couplage affiché sur l'autre appareil">
-						  <div class="input-group-append">
-						    <button class="btn btn-primary py-0 d-flex" type="button" id="save-coupling">Coupler</button>
-						  </div>
-						</div>
+						<form method="post" action="#" id="user-coupling">
+							<div class="input-group">
+									<input type="text" class="form-control" id="user-coupling-code" maxlength="10" autocomplete="off" placeholder="Entrez le code de couplage affiché sur le profil à dupliquer">
+									<div class="input-group-append">
+										<button class="btn btn-primary py-0 d-flex" type="submit" id="save-coupling">Coupler</button>
+		
+									</div>
+							</div>
+						</form>
 					</div>
 				</div>
 			</div>
@@ -157,7 +161,11 @@
 				  	<div class="item list-group-item py-2 px-2 disabled bg-light" id="config-username" style="display:none">
 					   <div class="mr-auto"><h6>Utilisateur lié</h6></div>
 				    	<div class="username" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
-				  	</div>
+					</div>
+					<div class="item list-group-item py-2 px-2 disabled bg-light" id="info-coupling" style="display:none">
+						<div class="mr-auto"><h6>Profil suivi</h6></div>
+						<div class="coupling-code-user" style="font-size: 0.8rem; font-family: 'Open Sans', sans-serif; font-weight: 700"></div>
+					</div>
 			  	</div>
 
 			  	<div class="list-group settings mt-2">

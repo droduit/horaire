@@ -7,7 +7,7 @@ const
 		'2019-05-30',
 		'2019-06-10', '2019-06-20',
 		'2019-08-01', '2019-08-15',
-		'2019-11-15',
+		'2019-11-01',
 		{date:'2019-12-24', morning:false, afternoon:true},	'2019-12-25', '2019-12-26', {date:'2019-12-31', morning:false, afternoon:true},
 
 		'2020-01-01', '2020-01-02'
@@ -58,7 +58,11 @@ const
 			 
 			request.fail( (jqXHR, textStatus) => {
 				if (callbackError != null && callbackError instanceof Function) {
-					callbackError(error);
+					callbackError(textStatus);
+				} else {
+					if (callbackSuccess != null && callbackSuccess instanceof Function) {
+						callbackSuccess(textStatus);
+					}
 				}
 			});
 		};	
@@ -67,7 +71,7 @@ const
 			get 	: (endpoint, 		 callbackSuccess,    	 callbackError = null) => request(endpoint, "GET", null, callbackSuccess, callbackError),
 			post 	: (endpoint, body, callbackSuccess = null, callbackError = null) => request(endpoint, "POST", body, callbackSuccess, callbackError),
 			put 	: (endpoint, body, callbackSuccess = null, callbackError = null) => request(endpoint, "PUT", body, callbackSuccess, callbackError),
-			delete: (endpoint, 		 callbackSuccess = null, callbackError = null) => request(endpoint, "DELETE", null, callbackSuccess, callbackError)
+			delete  : (endpoint, 		 callbackSuccess = null, callbackError = null) => request(endpoint, "DELETE", null, callbackSuccess, callbackError)
 		}
 
 	})("src/call_api.php?endpoint=");

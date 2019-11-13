@@ -34,6 +34,7 @@
     "gulp-uglify": "^3.0.2"
   },
   "dependencies": {
+    "eslint": "^6.6.0",
     "gulp-htmlmin": "^5.0.1"
   }
 }

@@ -1,8 +1,6 @@
 <?php
 require_once dirname(__FILE__).'/../passwd.php';
 require_once dirname(__FILE__).'/../db_connect.php';
-require_once dirname(__FILE__).'/Controller/UserController.php';
-require_once dirname(__FILE__).'/Controller/UserStorageController.php';
 
 header("Access-Control-Allow-Origin: https://dominique.leroduit.com");
 header("Access-Control-Allow-Methods: POST, GET, PUT, DELETE");
@@ -12,13 +10,15 @@ header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers
 
 $requestMethod = $_GET['requestMethod'] ?? $_SERVER['REQUEST_METHOD'];
 $endpointUri = isset($_GET['r']) ? explode("/", substr(@$_GET['r'], 1)) : array(null);
-$queriesRaw = explode("&", $_SERVER['QUERY_STRING']);
-array_shift($queriesRaw);
+
+$posLastQuestionMark = strripos($_SERVER['REQUEST_URI'], "?");
+$queriesRaw = $posLastQuestionMark === false ? array() : explode("&", substr($_SERVER['REQUEST_URI'], $posLastQuestionMark+1));
 $queries = array();
 foreach ($queriesRaw as $query) {
     $queryComponent = explode("=", $query);
     $queries[$queryComponent[0]] = $queryComponent[1];
 }
+
 
 // Authentication
 $user = $_SERVER['PHP_AUTH_USER'];
@@ -34,13 +34,27 @@ if (!$authorized) {
 
 switch ($endpointUri[0]) {
     case "users":
+        require_once dirname(__FILE__).'/Controller/UserController.php';
         $controller = new UserController($mysqli, $requestMethod, $endpointUri, $queries);
         $controller->processRequest();
         break;
-	case "user-storage":
+    case "user-storage":
+        require_once dirname(__FILE__).'/Controller/UserStorageController.php';
 		$controller = new UserStorageController($mysqli, $requestMethod, $endpointUri, $queries);
         $controller->processRequest();
         break;
+    case "user-time":
+        require_once dirname(__FILE__).'/Controller/UserTimeController.php';
+        $controller = new UserTimeController($mysqli, $requestMethod, $endpointUri, $queries);
+        $controller->processRequest();
+        break;
+
+    case "push-subscription":
+        require_once dirname(__FILE__).'/Controller/PushController.php';
+        $controller = new PushController($mysqli, $requestMethod, $endpointUri, $queries);
+        $controller->processRequest();
+        break;
+
     default:
         header("HTTP/1.1 404 Not Found");
         exit();

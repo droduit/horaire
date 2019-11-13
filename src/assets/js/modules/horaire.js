@@ -140,6 +140,12 @@ $(function(){
 
 				processGroup(groupId);
 				timeline.create();
+
+				api.post('user-time/'+localStorage.getItem("coupling-code"), {
+					type1: "hour",
+					type2: $(this).attr("idxTimeInput"),
+					value: $(this).val()
+				});
 			}
 		}
 	})
@@ -793,11 +799,11 @@ function getTotalTimeWorked() {
 	for(var i = 1; i < lastIdxTimeInput; i += 2) {
 		if ($('.hour[idxTimeInput="'+i+'"]').val().length == 5 && $('.hour[idxTimeInput="'+(i+1)+'"]').val().length == 5) {
 			var interval = getTimeForValue($('.hour[idxTimeInput="'+(i+1)+'"]').val()) - getTimeForValue($('.hour[idxTimeInput="'+i+'"]').val());
-			console.log("["+(i+1)+"-"+i+"]", interval);
+			// console.log("["+(i+1)+"-"+i+"]", interval);
 			timeWorked += interval;
 		}
 	}
-	console.log("total", timeWorked);
+	//console.log("total", timeWorked);
 	return timeWorked;
 }
 

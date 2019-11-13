@@ -1,20 +1,17 @@
 <?php
 require_once dirname(__FILE__).'/AbstractController.php';
-require_once dirname(__FILE__).'/../TableGateway/UserGateway.php';
+require_once dirname(__FILE__).'/../TableGateway/PushGateway.php';
 
-class UserController extends AbstractController {
+class PushController extends AbstractController {
 	private $db;
 	private $requestMethod;
-	private $couplingCode;
-
 	private $gateway;
 
 	public function __construct($db, $requestMethod, $endpointUri, $queries) {
+		$this->gateway = new PushGateway($db, $queries);
+
 		$this->db = $db;
 		$this->requestMethod = $requestMethod;
-		$this->gateway = new UserGateway($db, $queries);
-
-		$this->couplingCode = isset($endpointUri[1]) ? $endpointUri[1] : null;
 	}
 
 	public function processRequest() {
@@ -22,22 +19,17 @@ class UserController extends AbstractController {
 		$response = $this->notFoundResponse();
 
 		switch ($this->requestMethod) {
-			case 'GET':
-				if ($this->couplingCode) {
-		        	$response = $this->get($this->couplingCode);
-		    	}
-		        break;
 
 		    case 'POST':
 		        $response = $this->insert(); 
 		        break;
 
 		    case 'PUT':
-		        $response = $this->update($this->couplingCode); 
+		        $response = $this->update(); 
 		        break;
 
 		    case 'DELETE':
-		        $response = $this->delete($this->couplingCode);
+		        $response = $this->delete();
 		        break;
 
 		    default:
@@ -51,8 +43,9 @@ class UserController extends AbstractController {
 		}
 	}
 
-	private function get($couplingCode) {
-		$result = $this->gateway->get($couplingCode);
+	private function get() {
+		$input = (array) json_decode(file_get_contents("php://input"), true);
+		$result = $this->gateway->get($input);
 		if(!$result) {
 			return $this->notFoundResponse();
 		}
@@ -64,13 +57,11 @@ class UserController extends AbstractController {
 	private function insert() {
 		$input = (array) json_decode(file_get_contents("php://input"), true);
 
-		if (isset($input['couplingCode'])) {
-			$result = $this->gateway->get($input['couplingCode']);
-			if ($result) {
-				return $this->update($input['couplingCode']);
-			}
+		$result = $this->gateway->get($input);
+		if ($result) {
+			return $this->update();
 		}
-
+		
 		if(!$this->validateInput($input)) {
 			return $this->unprocessableEntityResponse();
 		}
@@ -80,36 +71,43 @@ class UserController extends AbstractController {
 		return $response;
 	}
 
-	private function update($couplingCode) {
-		$result = $this->gateway->get($couplingCode);
+	private function update() {
+		$input = (array) json_decode(file_get_contents("php://input"), true);
+
+		$result = $this->gateway->get($input);
 		if (!$result) {
 			return $this->insert();
-			//return $this->notFoundResponse();
 		}
-
-		$input = (array) json_decode(file_get_contents("php://input"), true);
+		
 		if (!$this->validateInput($input)) {
 			return $this->unprocessableEntityResponse();
 		}
-		$result = $this->gateway->update($couplingCode, $input);
+		$result = $this->gateway->update($input);
 		$response['status_code'] = "HTTP/1.1 200 OK";
 		$response['body'] = json_encode(["affected_rows" => $result]);
 		return $response;
 	}
 
-	private function delete($couplingCode) {
-		$result = $this->gateway->get($couplingCode);
+	private function delete() {
+		$input = (array) json_decode(file_get_contents("php://input"), true);
+		$result = $this->gateway->get($input);
 		if (!$result) {
 			return $this->notFoundResponse();
 		}
-		$result = $this->gateway->delete($couplingCode);
+
+		$subscription = $input['subscription'];
+
+		$result = $this->gateway->delete($subscription['endpoint']);
 		$response['status_code'] = "HTTP/1.1 204 No Content";
 		$response['body'] = json_encode(["affected_rows" => $result]);
 		return $response;
 	}
 
 	protected function validateInput($input) {
-		if (!isset($input['couplingCode'])) {
+		if (!isset($input['subscription'])) {
+			return false;
+		}
+		if (!isset($input['subscription']['endpoint'])) {
 			return false;
 		}
 		return true;

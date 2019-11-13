@@ -1,23 +1,23 @@
 <?php
 require_once dirname(__FILE__).'/AbstractController.php';
-require_once dirname(__FILE__).'/../TableGateway/UserStorageGateway.php';
+require_once dirname(__FILE__).'/../TableGateway/UserTimeGateway.php';
 
-class UserStorageController extends AbstractController {
+class UserTimeController extends AbstractController {
 	private $db;
 	private $requestMethod;
+	private $queries;
 	private $gateway;
 
-	private $username;
-	private $property;
+	private $couplingCode;
 
 	public function __construct($db, $requestMethod, $endpointUri, $queries) {
-		$this->gateway = new UserStorageGateway($db, $queries);
-
+		$this->gateway = new UserTimeGateway($db);
 		$this->db = $db;
 		$this->requestMethod = $requestMethod;
-		
-		$this->username = isset($endpointUri[1]) ? $endpointUri[1] : null;
-		$this->property  = isset($endpointUri[2]) ? $endpointUri[2] : null;
+		$this->queries = $queries;
+
+		// /user-time/couplingCode?type1=...&type2=...&date=...
+		$this->couplingCode = isset($endpointUri[1]) ? $endpointUri[1] : null; 
 	}
 
 	public function processRequest() {
@@ -26,17 +26,23 @@ class UserStorageController extends AbstractController {
 
 		switch ($this->requestMethod) {
 			case 'GET':
-				if ($this->username != null) {
-		        	$response = $this->getStorage($this->username, $this->property);
+				if ($this->couplingCode != null) {
+		        	$response = $this->get($this->couplingCode, $this->queries);
 		    	}
-		        break;
+				break;
+				
+			case 'PUT':
+				if ($this->couplingCode != null) {
+					$response = $this->update($this->couplingCode);
+				}
+				break;
 
 		    case 'POST':
-				if ($this->username != null) {
-					$response = $this->insertStorage($this->username); 
+				if ($this->couplingCode != null) {
+					$response = $this->insert($this->couplingCode); 
 				}
 		        break;
-
+			
 		    default:
 		        $response = $this->notFoundResponse();
 		        break;
@@ -48,8 +54,8 @@ class UserStorageController extends AbstractController {
 		}
 	}
 
-	private function getStorage($username, $property) {
-		$result = $this->gateway->get($username, $property);
+	private function get($couplingCode, $queries) {
+		$result = $this->gateway->get($couplingCode, $queries);
 		if(!$result) {
 			return $this->notFoundResponse();
 		}
@@ -58,7 +64,7 @@ class UserStorageController extends AbstractController {
 		return $response;
 	} 
 
-	private function insertStorage($username) {
+	private function insert($couplingCode) {
 		$input = (array) json_decode(file_get_contents("php://input"), true);
 
 		if (isset($input[0]) && is_array($input[0])) {
@@ -67,13 +73,13 @@ class UserStorageController extends AbstractController {
 				if(!$this->validateInput($entry)) {
 					return $this->unprocessableEntityResponse();
 				}
-				$result[] = $this->gateway->insertOrReplace($username, $entry);
+				$result[] = $this->gateway->insertOrReplace($couplingCode, $entry);
 			}
 		} else {
 			if(!$this->validateInput($input)) {
 				return $this->unprocessableEntityResponse();
 			}
-			$result = $this->gateway->insertOrReplace($username, $input);
+			$result = $this->gateway->insertOrReplace($couplingCode, $input);
 		}
 		
 		$response['status_code'] = "HTTP/1.1 201 Created";
@@ -81,35 +87,37 @@ class UserStorageController extends AbstractController {
 		return $response;
 	}
 
-	private function updateStorage($username, $property) {
-		$result = $this->gateway->get($username, $property);
+	private function update($couplingCode) {
+		$input = (array) json_decode(file_get_contents("php://input"), true);
+
+		$result = $this->gateway->get($couplingCode, $input);
 		if (!$result) {
 			return $this->notFoundResponse();
 		}
-		$input = (array) json_decode(file_get_contents("php://input"), true);
+		
 		if (!$this->validateInput($input)) {
 			return $this->unprocessableEntityResponse();
 		}
-		$result = $this->gateway->update($username, $property, $input);
+		$result = $this->gateway->update($couplingCode, $input);
 
 		$response['status_code'] = "HTTP/1.1 200 OK";
 		$response['body'] = json_encode(["affected_rows" => $result]);
 		return $response;
 	}
 
-	private function deleteStorage($username, $property) {
-		$result = $this->gateway->get($username, $property);
+	private function delete($couplingCode, $queries) {
+		$result = $this->gateway->get($couplingCode, $queries);
 		if (!$result) {
 			return $this->notFoundResponse();
 		}
-		$result = $this->gateway->delete($username);
+		$result = $this->gateway->delete($couplingCode, $queries);
 		$response['status_code'] = "HTTP/1.1 204 No Content";
 		$response['body'] = json_encode(["affected_rows" => $result]);
 		return $response;
 	}
 
 	public function validateInput($input) {
-		if (!isset($input['property'])) {
+		if (!isset($input['type1'])) {
 			return false;
 		}
 		if (!isset($input['value'])) {
