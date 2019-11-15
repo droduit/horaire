@@ -141,11 +141,11 @@ $(function(){
 				processGroup(groupId);
 				timeline.create();
 
-				api.post('user-time/'+localStorage.getItem("coupling-code"), {
+				setTimeout(api.post('user-time/'+localStorage.getItem("coupling-code"), {
 					type1: "hour",
 					type2: $(this).attr("idxTimeInput"),
 					value: $(this).val()
-				});
+				}), 500);
 			}
 		}
 	})
@@ -170,6 +170,11 @@ $(function(){
 			fillCurrentOvertime();
 			processOvertimeStats(getTimeForInput("previousOvertime"));
 			processFinalTime();
+
+			api.post('user-time/'+localStorage.getItem("coupling-code"), {
+				type1: "previousOvertime",
+				value: localStorage.getItem("previousOvertime")
+			});
 		}
 	}).on('keyup', '#currentOvertime', function() {
 		if (isFilled("currentOvertime")) {
@@ -252,17 +257,23 @@ $(function(){
 	displayTimelapseBeforeHolidays();
 
 
-	// Affiche les timbrages en base de données s'ils existent
+	// Affiche les timbrages peoplesoft s'ils existent
 	if(localStorage.getItem("username")) {
 		function getTimbragesFromDB() {
-			api.get('user-storage/'+localStorage.getItem("coupling-code")+"&date="+moment().format("YYYY-MM-DD"),
+			api.get('user-storage/'+localStorage.getItem("coupling-code")+"?date="+moment().format("YYYY-MM-DD"),
 			json => {
+				console.log(json);
 				if (json.timbrages) {
 					json.timbrages.split(",").forEach( (timbrage, index) => {
 						var hourElem = $('.hour[idxTimeInput="'+(++index)+'"]');
 						if (hourElem.length > 0) {
 							hourElem.val(timbrage).trigger("keyup");
 						}
+					});
+				}
+				if (json.soldes) {
+					json.soldes.split(",").forEach( (solde, index) => {
+						$('#previousOvertime').val(solde).trigger("keyup");
 					});
 				}
 			});

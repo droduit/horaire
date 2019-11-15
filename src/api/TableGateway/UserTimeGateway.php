@@ -37,12 +37,30 @@ class UserTimeGateway {
 		return in_array($colName, $allowed);
 	}
 
-	public function get(String $couplingCode, ?Array $queries) : ?Array {
-        $stmt = "SELECT type1, type2, date, value FROM ".self::TABLENAME." WHERE idUser = ".UserGateway::QUERY_GET_ID_FROM_CODE;
-		$stmt .= $this->resolveQueries($queries);
+	public function get(String $couplingCode, ?String $level2, ?Array $queries) : ?Array {
+		$params = [ ["s", $couplingCode] ];
+
+		switch ($level2) {
+			case "avg-time":
+				$stmt = "SELECT type1, type2, avg(substring(value,1,2)*60 + substring(value, 4,5)) as average, count(*) as samples FROM ".self::TABLENAME." WHERE idUser=".UserGateway::QUERY_GET_ID_FROM_CODE." AND value like '__:__' ".$this->resolveQueries($queries)." group by type1, type2";
+				break;
+
+			default:
+				$stmt = "SELECT type1, type2, date, value FROM ".self::TABLENAME." WHERE idUser = ".UserGateway::QUERY_GET_ID_FROM_CODE;
+				$stmt .= $this->resolveQueries($queries);
+		}
+		
 
         if ($stmt = $this->db->prepare($stmt)) {
-        	$stmt->bind_param("s", $couplingCode);
+			$params_to_bind = array(implode("", array_map(function($item) { return $item[0]; }, $params)));
+
+			foreach($params as $array) {
+				$value = &$array[1];
+				$params_to_bind[] = &$value;
+			}
+
+			call_user_func_array(array($stmt, 'bind_param'), $params_to_bind);
+        	//$stmt->bind_param("s", $couplingCode);
             $stmt->execute();
 			$stmt_result = $stmt->get_result();
 			
@@ -63,7 +81,7 @@ class UserTimeGateway {
     }
 
     public function insertOrReplace(String $couplingCode, Array $input) : int {
-		if ($this->get($couplingCode, $input) == null) {
+		if ($this->get($couplingCode, null, $input) == null) {
 			$stmt = "INSERT INTO ".self::TABLENAME." (idUser, type1, type2, value, date) VALUES ( ".UserGateway::QUERY_GET_ID_FROM_CODE.", ?, ?, ?, now())";
 			
 			if ($stmt = $this->db->prepare($stmt)) {

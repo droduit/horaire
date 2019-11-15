@@ -59,8 +59,9 @@ gulp.task('js-clean-concat-minify', function() {
       // --- Modules de l'application
       path.dev.js + 'modules/index.js', // Code hors modules      
   		path.dev.js + 'modules/config.js',  // Page configuration
-  		path.dev.js + 'modules/horaire.js',  // Page horaire
-  		path.dev.js + 'modules/time-converter.js', // Page convertisseur de temps  
+      path.dev.js + 'modules/horaire.js',  // Page horaire
+      path.dev.js + 'modules/timesheet.js', // Page timesheet
+  		// path.dev.js + 'modules/time-converter.js', // Page convertisseur de temps  
       path.dev.js + 'modules/holidayPlan.js' // Planificateur de vacances
     ])
     .pipe(plugins.concat('bundle.js'))

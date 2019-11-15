@@ -9,6 +9,7 @@ class UserTimeController extends AbstractController {
 	private $gateway;
 
 	private $couplingCode;
+	private $level2;
 
 	public function __construct($db, $requestMethod, $endpointUri, $queries) {
 		$this->gateway = new UserTimeGateway($db);
@@ -18,6 +19,7 @@ class UserTimeController extends AbstractController {
 
 		// /user-time/couplingCode?type1=...&type2=...&date=...
 		$this->couplingCode = isset($endpointUri[1]) ? $endpointUri[1] : null; 
+		$this->level2 = isset($endpointUri[2]) ? $endpointUri[2] : null;
 	}
 
 	public function processRequest() {
@@ -27,7 +29,7 @@ class UserTimeController extends AbstractController {
 		switch ($this->requestMethod) {
 			case 'GET':
 				if ($this->couplingCode != null) {
-		        	$response = $this->get($this->couplingCode, $this->queries);
+					$response = $this->get($this->couplingCode, $this->level2, $this->queries);
 		    	}
 				break;
 				
@@ -54,8 +56,8 @@ class UserTimeController extends AbstractController {
 		}
 	}
 
-	private function get($couplingCode, $queries) {
-		$result = $this->gateway->get($couplingCode, $queries);
+	private function get($couplingCode, $level2, $queries) {
+		$result = $this->gateway->get($couplingCode, $level2, $queries);
 		if(!$result) {
 			return $this->notFoundResponse();
 		}
@@ -90,7 +92,7 @@ class UserTimeController extends AbstractController {
 	private function update($couplingCode) {
 		$input = (array) json_decode(file_get_contents("php://input"), true);
 
-		$result = $this->gateway->get($couplingCode, $input);
+		$result = $this->gateway->get($couplingCode, null, $input);
 		if (!$result) {
 			return $this->notFoundResponse();
 		}
@@ -106,7 +108,7 @@ class UserTimeController extends AbstractController {
 	}
 
 	private function delete($couplingCode, $queries) {
-		$result = $this->gateway->get($couplingCode, $queries);
+		$result = $this->gateway->get($couplingCode, null, $queries);
 		if (!$result) {
 			return $this->notFoundResponse();
 		}

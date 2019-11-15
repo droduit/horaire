@@ -74,4 +74,20 @@ const
 			delete  : (endpoint, 		 callbackSuccess = null, callbackError = null) => request(endpoint, "DELETE", null, callbackSuccess, callbackError)
 		}
 
-	})("src/call_api.php?endpoint=");
+	})("src/call_api.php?endpoint="),
+	
+	getLabelForInput = (type1, type2) => {
+		var label = "";
+		switch (type1) {
+			case "hour":
+				label += "Timbrage";
+				break;
+			case "previousOvertime":
+				label += "Solde horaire";
+				break;
+		}
+		if (type2) {
+			label += " "+type2;
+		}
+		return label;
+	};

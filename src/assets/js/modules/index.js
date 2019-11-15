@@ -117,6 +117,14 @@ const nav = {
 				document.location.hash = "";
 				hash = "";
 			}
+		} else if (hash.startsWith("#coupling=")) {
+			var couplingCode = hash.replace("#coupling=", "");
+			if (couplingCode.length > 0) {
+				$('#user-coupling-code').val(couplingCode);
+				$('form#user-coupling').submit();
+				document.location.hash = "";
+				hash = "";
+			}
 		}
 
 		if(hash.length > 1) {

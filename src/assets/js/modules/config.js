@@ -117,9 +117,14 @@ $(function(){
 	if(!localStorage.getItem("coupling-code")) {
 		localStorage.setItem("coupling-code", random.getString(10));
 	}
-	$("input.coupling-code").val(localStorage.getItem("coupling-code"));
+	$("input.coupling-code").val(localStorage.getItem("coupling-code")).click(() => setTimeout(() => $('input.coupling-code').select(), 100));
 	$("div.coupling-code").html(localStorage.getItem("coupling-code"));
+	$('#copy-coupling-link').click(() => {
+		navigator.clipboard.writeText(document.location.href.replace(document.location.hash, "")+"#coupling="+localStorage.getItem("coupling-code"))
+		.then(() =>	showToastUpdate("clipboard-success"), (err) => bootbox.alert("Le lien n'a pas pu être copié dans le presse papier.<br>"+err));
+	});
 	
+
 	$('#renew-coupling-code').click(() => {
 		$("input.coupling-code, #renew-coupling-code").attr("disabled", "disabled");
 		const newCouplingCode = random.getString(10);
@@ -164,11 +169,13 @@ $(function(){
 
 	const showCouplingParams = () => {
 		if (localStorage.getItem("coupling-code-following")) {
+			$('#status-coupling, a[href="#config-coupling"] .active').removeClass("d-none");
 			$('#info-coupling').addClass("d-flex");
 			$('#save-coupling').attr("id", "cancel-coupling").removeClass("btn-primary").addClass("btn-danger").html("Interrompre");
 			$('.coupling-code-user').html(localStorage.getItem("coupling-code-following"));
 			$('#user-coupling-code').val(localStorage.getItem("coupling-code-following")).attr("disabled", "disabled");
 		} else {
+			$('#status-coupling, a[href="#config-coupling"] .active').addClass("d-none");
 			$('#info-coupling').removeClass("d-flex");
 			$('#user-coupling-code').val("").removeAttr("disabled");
 			$('#cancel-coupling').attr("id", "save-coupling").removeClass("btn-danger").addClass("btn-primary").html("Coupler");
@@ -181,11 +188,21 @@ $(function(){
 	const fetchCoupledProfil = () => {
 		if (localStorage.getItem("coupling-code-following")) {
 			const fetchData = () => {
-				api.get('user-time/'+localStorage.getItem("coupling-code-following"), json => {
+				api.get('user-time/'+localStorage.getItem("coupling-code-following")+"?date="+moment().format("YYYY-MM-DD"), json => {
+					console.log("followed", json);
 					for (var i = 0; i < json.length; ++i) {
-						$('input.'+json[i].type1+"[idxTimeInput='"+json[i].type2+"']").val(json[i].value).trigger("keyup");
+						if (json[i].type1 == "hour") {
+							$('input.'+json[i].type1+"[idxTimeInput='"+json[i].type2+"']").val(json[i].value).trigger("keyup");
+						} else if(json[i].type1 == "previousOvertime") {
+							$('#previousOvertime').val(json[i].value).trigger("keyup");
+						}
 					}
 				});
+
+				if (localStorage.getItem("coupling-live") == "false") {
+					clearInterval(timerFetchCoupledProfil);
+					timerFetchCoupledProfil = false;
+				}
 			};
 			fetchData();
 			timerFetchCoupledProfil = setInterval(fetchData, 5000);
@@ -195,6 +212,9 @@ $(function(){
 		}
 	};
 	fetchCoupledProfil();
+
+	$('#coupling-live').click(() => setTimeout(fetchCoupledProfil, 500));
+	
 
 	// -- Config - Username
 	if(localStorage.getItem("username")) {
@@ -214,6 +234,8 @@ const showToastUpdate = (context) => {
     	toastOptions = {delay:10000};
 	} else if (context == "coupling-done") {
 		content = '<div class="d-flex"><div><i class="material-icons mr-2 text-success" style="vertical-align: bottom;">check_circle_outline</i>Couplé avec le profil <b>'+localStorage.getItem("coupling-code-following")+'</b></div></div>';
+	} else if (context == "clipboard-success") {
+		content = '<div class="d-flex"><div><i class="material-icons mr-2 text-success" style="vertical-align: bottom;">check_circle_outline</i>Copié dans le presse-papier.</div></div>';
 	}
 
     $('.toast .toast-header').hide();

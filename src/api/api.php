@@ -8,10 +8,10 @@ header("Content-Type: application/json; charset=UTF-8");
 header("Access-Control-Max-Age: 3600");
 header("Access-Control-Allow-Headers: Content-Type, Access-Control-Allow-Headers, Authorization, X-Requested-With");
 
-$requestMethod = $_GET['requestMethod'] ?? $_SERVER['REQUEST_METHOD'];
-$endpointUri = isset($_GET['r']) ? explode("/", substr(@$_GET['r'], 1)) : array(null);
-
 $posLastQuestionMark = strripos($_SERVER['REQUEST_URI'], "?");
+$requestMethod = $_GET['requestMethod'] ?? $_SERVER['REQUEST_METHOD'];
+$endpointUri = isset($_GET['r']) ? explode("/", str_replace(substr($_SERVER['REQUEST_URI'], $posLastQuestionMark), "", substr(@$_GET['r'], 1))) : array(null);
+
 $queriesRaw = $posLastQuestionMark === false ? array() : explode("&", substr($_SERVER['REQUEST_URI'], $posLastQuestionMark+1));
 $queries = array();
 foreach ($queriesRaw as $query) {
