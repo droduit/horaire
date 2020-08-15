@@ -1,16 +1,14 @@
 // Jours fériés / chomés
 const
 	publicHolidays = [
-		'2019-01-01', '2019-01-02',
-		'2019-03-19',
-		'2019-04-19', '2019-04-22',
-		'2019-05-30',
-		'2019-06-10', '2019-06-20',
-		'2019-08-01', '2019-08-15',
-		'2019-11-01',
-		{date:'2019-12-24', morning:false, afternoon:true},	'2019-12-25', '2019-12-26', {date:'2019-12-31', morning:false, afternoon:true},
-
-		'2020-01-01', '2020-01-02'
+		'2020-01-01', '2020-01-02',
+		'2020-03-19',
+		'2020-04-10', '2020-04-13',
+		'2020-05-21',
+		'2020-06-01', '2020-06-11',
+		'2020-08-01', '2020-08-15',
+		'2020-11-01',
+		'2020-12-08', {date:'2020-12-24', morning:false, afternoon:true},	'2020-12-25', {date:'2020-12-31', morning:false, afternoon:true}
 	].map(item => item.hasOwnProperty('date') ? item : {date:item, morning:true, afternoon:true}),
 
 	timePattern = {

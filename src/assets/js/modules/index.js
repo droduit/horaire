@@ -46,7 +46,7 @@ $(function(){
 	 */	
 	if(!localStorage.getItem("ip")) {
 		$.getJSON('https://api.ipify.org?format=jsonp&callback=?', function(data) {
-			if(data.ip == "195.65.93.18") {
+			if(data.ip == "195.65.93.18" || data.ip == "185.249.189.225") {
 				localStorage.setItem("isGM", true);
 				gm.triggerActions("call1");
 			}
@@ -177,7 +177,7 @@ const gm = {
 			.removeClass("active")
 			.before(
 				'<i class="material-icons text-danger warning" data-toggle="popover" '+
-				'title="Désactivé par le GM avec ce navigateur" data-content="<small>Le firewall du GM bloque les requêtes du service Google Cloud Messaging utilisé par l\'API webpush (Se voit en vérifiant le Connection State à l\'adresse chrome://gcm-internals/). Il faut alors utiliser <a href=\'https://www.mozilla.org/fr/firefox/new/\' target=\'_blank\'>Firefox</a> pour profiter de cette fonctionnalité (puisque les navigateurs utilisent des services de cloud messaging différents, et celui de Firefox n\'est pas bloqué).</small>" '+
+				'data-content="<small>Le firewall du GM bloque le service <a href=\'chrome://gcm-internals/\'>Google Cloud Messaging</a>. Utiliser <a href=\'https://www.mozilla.org/fr/firefox/new/\' target=\'_blank\'>Firefox</a> pour profiter des notifications push.</small>" '+
 				'data-trigger="hover" data-placement="bottom" data-container=".page[data-id=config-preferences]" '+
 				'data-html="true">warning</i>')
 			.closest('.item')

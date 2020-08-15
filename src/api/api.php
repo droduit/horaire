@@ -16,7 +16,9 @@ $queriesRaw = $posLastQuestionMark === false ? array() : explode("&", substr($_S
 $queries = array();
 foreach ($queriesRaw as $query) {
     $queryComponent = explode("=", $query);
-    $queries[$queryComponent[0]] = $queryComponent[1];
+	if ($queryComponent[0] != "endpoint") {
+		$queries[$queryComponent[0]] = $queryComponent[1];
+	}
 }
 
 
