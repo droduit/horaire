@@ -10,7 +10,7 @@ A service worker cache and fetch the cached files to provide an offline availabi
 
 Once NodeJS installed:
 1. Install Gulp: `npm install gulp -g`
-2. Open a terminal at the root of the project (containing the `package.json` file): `npm install`
+2. Open a terminal in your project root directory (containing the `package.json` file): `npm install`
 
 ### Config
 - src/db_connect.php
@@ -21,3 +21,13 @@ Once NodeJS installed:
 - Preprocess, minify and concatenate all css files in bundle.min.css : `gulp css`
 - Concatenate, uglify and pack all javascript files as bundle.min.js : `gulp js`
 - Re-generate the css/js files for production : `gulp build`
+
+## Maintaining the project
+
+### Updating package dependencies
+- To display the outdated packages : `npm outdated`
+- To keep the dependencies up to date, simply run the command `npm update`.
+
+### Auditing package dependencies for security vulnerabilities
+1. Run the command `npm audit fix`
+2. Run `npm audit` and resolve manually the vulnerabilities left, if any.
